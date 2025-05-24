@@ -79,6 +79,7 @@ def load_pending_bets():
     """Carrega apostas pendentes do arquivo bets.csv"""
     try:
         df_pending = pd.read_csv("bets/bets_atualizadas.csv")
+        print(df_pending)
 
         # Filtra apenas apostas pendentes
         pending_bets = df_pending[df_pending["status"] == "pending"].copy()
@@ -875,7 +876,9 @@ def main():
 
         try:
             # Carrega todas as apostas
-            all_bets = load_pending_bets()  # Assumindo que esta função carrega o CSV completo
+            all_bets = (
+                load_pending_bets()
+            )  # Assumindo que esta função carrega o CSV completo
             
             # Filtra apenas apostas com status 'pending'
             pending_bets = all_bets[all_bets['status'] == 'pending'].copy()
