@@ -78,7 +78,7 @@ def ensure_datetime(df, date_column="date"):
 def load_pending_bets():
     """Carrega apostas pendentes do arquivo bets.csv"""
     try:
-        df_pending = pd.read_csv("bets/bets.csv")
+        df_pending = pd.read_csv("bets/bets_atualizadas.csv")
 
         # Filtra apenas apostas pendentes
         pending_bets = df_pending[df_pending["status"] == "pending"].copy()
@@ -874,9 +874,26 @@ def main():
         st.subheader("🔄 Apostas em Vigor")
 
         try:
-            pending_bets = load_pending_bets()
+            # Carrega todas as apostas
+            all_bets = load_pending_bets()  # Assumindo que esta função carrega o CSV completo
+            
+            # Filtra apenas apostas com status 'pending'
+            pending_bets = all_bets[all_bets['status'] == 'pending'].copy()
 
             if len(pending_bets) > 0:
+                # Converte a coluna 'date' para datetime para ordenação correta
+                try:
+                    pending_bets['date_parsed'] = pd.to_datetime(pending_bets['date'], format='%d %b %Y %H:%M')
+                except:
+                    # Fallback para outros formatos de data possíveis
+                    pending_bets['date_parsed'] = pd.to_datetime(pending_bets['date'], errors='coerce')
+                
+                # Ordena por data (mais próxima primeiro)
+                pending_bets = pending_bets.sort_values('date_parsed', ascending=True)
+                
+                # Remove a coluna auxiliar de data parseada
+                pending_bets = pending_bets.drop('date_parsed', axis=1)
+                
                 st.write(
                     f"📊 **{len(pending_bets)} apostas pendentes** (ordenadas por data mais próxima)"
                 )
@@ -886,7 +903,7 @@ def main():
                     col
                     for col in [
                         "date",
-                        "league",
+                        "league", 
                         "t1",
                         "t2",
                         "bet_type",
@@ -900,14 +917,19 @@ def main():
 
                 # Mostra tabela de apostas pendentes
                 st.dataframe(
-                    pending_bets[display_cols], use_container_width=True, height=400
+                    pending_bets[display_cols], 
+                    use_container_width=True, 
+                    height=400,
+                    hide_index=True
                 )
             else:
                 st.info(
                     "📭 Nenhuma aposta pendente encontrada no arquivo bets/bets.csv"
                 )
+            
         except Exception as e:
             st.error(f"Erro ao carregar apostas pendentes: {e}")
+            st.error("Verifique se o arquivo bets/bets.csv existe e contém a coluna 'status'")
 
         # Dados Detalhados
         st.markdown("---")
@@ -974,7 +996,7 @@ def main():
                 st.info("Coluna 'game' não encontrada nos dados")
         except Exception as e:
             st.error(f"Erro ao calcular estatísticas por mapa: {e}")
-            
+
         st.markdown("---")
         st.subheader("🎯 Odds Analysis")
         try:
