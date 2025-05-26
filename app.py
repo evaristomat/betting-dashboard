@@ -213,48 +213,240 @@ def display_summary(df, roi_value):
     except Exception as e:
         st.error(f"Erro no cálculo do resumo: {e}")
 
-
 def bankroll_plot(df):
-    """Gráfico de evolução do bankroll"""
+    """Gráfico de evolução do bankroll geral e por games"""
     if len(df) == 0:
         st.warning("No data available for bankroll plot.")
         return
 
-    window_size = 10
+    try:
+        # Garantir que temos dados finalizados
+        df_finished = df[df["status"].isin(["win", "loss"])].copy()
 
-    if len(df) < window_size:
-        st.warning(f"Dados insuficientes para média móvel de {window_size} apostas.")
-    else:
-        df["moving_average"] = (
-            df["cumulative_profit"].rolling(window=window_size).mean()
+        if len(df_finished) == 0:
+            st.warning("Nenhuma aposta finalizada encontrada.")
+            return
+
+        # Ordenar por data para evolução cronológica
+        df_finished = df_finished.sort_values("date").reset_index(drop=True)
+
+        # Verificar se temos a coluna game
+        has_game_column = (
+            "game" in df_finished.columns and not df_finished["game"].isna().all()
         )
 
-    plt.figure(figsize=(12, 7))
-    ax = sns.lineplot(
-        data=df,
-        x=df.index,
-        y="cumulative_profit",
-        marker="o",
-        label="Cumulative Profit",
-    )
+        if not has_game_column:
+            st.info("Coluna 'game' não encontrada. Mostrando apenas evolução geral.")
+            plot_simple_bankroll_evolution(df_finished)
+            return
 
-    if "moving_average" in df.columns and not df["moving_average"].isna().all():
-        sns.lineplot(
+        # Preparar dados para diferentes categorias
+        categories = {}
+
+        # Todos os games
+        categories["All Games"] = df_finished.copy()
+
+        # Games específicos
+        game_values = df_finished["game"].dropna().unique()
+        for game in sorted(game_values):
+            game_data = df_finished[df_finished["game"] == game].copy()
+            if len(game_data) > 0:
+                categories[f"Game {int(game)}"] = game_data
+
+        # Se só temos uma categoria, usar plot simples
+        if len(categories) <= 1:
+            plot_simple_bankroll_evolution(df_finished)
+            return
+
+        # Criar figura simples
+        plt.figure(figsize=(14, 8))
+
+        # Configurações
+        colors = ["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b"]
+
+        # ========== GRÁFICO: Evolução do Bankroll ==========
+        plt.title(
+            "Evolution of Bankroll by Game Category",
+            fontsize=16,
+            fontweight="bold",
+            color="white",
+        )
+
+        # Calcular estatísticas para cada categoria (para usar depois na tabela)
+        stats_data = []
+
+        for i, (category, data) in enumerate(categories.items()):
+            if len(data) == 0:
+                continue
+
+            # Resetar índice para sequência correta
+            data = data.reset_index(drop=True)
+
+            # Calcular lucro cumulativo
+            data["cumulative_profit"] = data["profit"].cumsum()
+
+            color = colors[i % len(colors)]
+
+            # Linha principal (sem média móvel)
+            plt.plot(
+                range(len(data)),
+                data["cumulative_profit"],
+                marker="o",
+                markersize=4,
+                label=f"{category} (Final: {data['cumulative_profit'].iloc[-1]:.2f}U)",
+                color=color,
+                linewidth=2,
+            )
+
+            # Calcular estatísticas para tabela
+            total_bets = len(data)
+            wins = len(data[data["status"] == "win"])
+            losses = len(data[data["status"] == "loss"])
+            winrate = (wins / total_bets * 100) if total_bets > 0 else 0
+            total_profit = data["profit"].sum()
+            avg_roi = data["ROI"].mean() if "ROI" in data.columns else 0
+
+            stats_data.append(
+                {
+                    "Category": category,
+                    "Total Bets": total_bets,
+                    "Wins": wins,
+                    "Losses": losses,
+                    "Win Rate (%)": winrate,
+                    "Total Profit": total_profit,
+                    "Avg ROI (%)": avg_roi,
+                }
+            )
+
+        plt.axhline(y=0, color="gray", linestyle="-", alpha=0.3)
+        plt.ylabel("Cumulative Profit (units)", fontsize=12, color="white")
+        plt.xlabel("Bet Sequence", fontsize=12, color="white")
+        plt.legend(loc="best")  # Legenda dentro do gráfico
+        plt.grid(True, alpha=0.3)
+
+        plt.tight_layout()
+        st.pyplot(plt.gcf())
+
+        # ========== TABELA DE ESTATÍSTICAS DETALHADAS ==========
+        st.subheader("📊 Detailed Statistics by Game Category")
+
+        if stats_data:
+            # Criar DataFrame a partir dos dados coletados
+            stats_df = pd.DataFrame(stats_data)
+
+            display_stats = stats_df.copy()
+            display_stats["Win Rate (%)"] = display_stats["Win Rate (%)"].round(2)
+            display_stats["Total Profit"] = display_stats["Total Profit"].round(2)
+            display_stats["Avg ROI (%)"] = display_stats["Avg ROI (%)"].round(2)
+
+            st.dataframe(display_stats, use_container_width=True)
+
+            # Insights automáticos
+            st.subheader("🔍 Key Insights")
+
+            if len(display_stats) > 1:
+                # Melhor categoria por profit
+                best_profit_idx = display_stats["Total Profit"].idxmax()
+                best_profit_cat = display_stats.loc[best_profit_idx, "Category"]
+                best_profit_value = display_stats.loc[best_profit_idx, "Total Profit"]
+
+                # Melhor winrate
+                best_winrate_idx = display_stats["Win Rate (%)"].idxmax()
+                best_winrate_cat = display_stats.loc[best_winrate_idx, "Category"]
+                best_winrate_value = display_stats.loc[best_winrate_idx, "Win Rate (%)"]
+
+                col1, col2, col3 = st.columns(3)
+
+                with col1:
+                    st.metric(
+                        "🏆 Best Profit Category",
+                        best_profit_cat,
+                        f"{best_profit_value:.2f} units",
+                    )
+
+                with col2:
+                    st.metric(
+                        "🎯 Best Win Rate",
+                        best_winrate_cat,
+                        f"{best_winrate_value:.1f}%",
+                    )
+
+                with col3:
+                    total_games = len(
+                        [
+                            cat
+                            for cat in categories.keys()
+                            if "Game" in cat and cat != "All Games"
+                        ]
+                    )
+                    st.metric("🎮 Game Categories", total_games, "detected")
+
+                # Análise comparativa adicional
+                if total_games >= 2:
+                    game_categories = display_stats[
+                        display_stats["Category"].str.contains("Game ")
+                    ].copy()
+                    if len(game_categories) >= 2:
+                        st.write("**🎮 Game-by-Game Analysis:**")
+
+                        best_game_profit = game_categories.loc[
+                            game_categories["Total Profit"].idxmax()
+                        ]
+                        worst_game_profit = game_categories.loc[
+                            game_categories["Total Profit"].idxmin()
+                        ]
+
+                        col1, col2 = st.columns(2)
+                        with col1:
+                            st.success(
+                                f"📈 **Most Profitable**: {best_game_profit['Category']} with {best_game_profit['Total Profit']:.2f}U"
+                            )
+                        with col2:
+                            if worst_game_profit["Total Profit"] < 0:
+                                st.error(
+                                    f"📉 **Least Profitable**: {worst_game_profit['Category']} with {worst_game_profit['Total Profit']:.2f}U"
+                                )
+                            else:
+                                st.info(
+                                    f"📊 **Least Profitable**: {worst_game_profit['Category']} with {worst_game_profit['Total Profit']:.2f}U"
+                                )
+
+    except Exception as e:
+        st.error(f"Erro no gráfico de bankroll: {e}")
+        # Fallback para plot simples
+        plot_simple_bankroll_evolution(df)
+
+
+def plot_simple_bankroll_evolution(df):
+    """Função de fallback para plot simples sem separação por games"""
+    try:
+        df = df.reset_index(drop=True)
+        df["cumulative_profit"] = df["profit"].cumsum()
+
+        plt.figure(figsize=(12, 7))
+
+        # Linha principal
+        ax = sns.lineplot(
             data=df,
             x=df.index,
-            y="moving_average",
-            color="red",
-            label=f"{window_size}-bet Moving Average",
+            y="cumulative_profit",
+            marker="o",
+            label="Cumulative Profit",
         )
 
-    plt.title("Evolution of Bankroll Over Bets with Moving Average")
-    plt.ylabel("Cumulative Profit")
-    plt.xlabel("Bet Sequence")
-    plt.legend()
-    plt.grid(True)
-    plt.tight_layout()
-    st.pyplot(ax.get_figure())
+        # Linha de referência zero
+        plt.axhline(y=0, color="gray", linestyle="-", alpha=0.3)
 
+        plt.title("Evolution of Bankroll Over Bets", fontsize=16, fontweight="bold")
+        plt.ylabel("Cumulative Profit (units)", fontsize=12)
+        plt.xlabel("Bet Sequence", fontsize=12)
+        plt.legend(loc="best")  # Legenda dentro do gráfico
+        plt.grid(True, alpha=0.3)
+        plt.tight_layout()
+        st.pyplot(ax.get_figure())
+
+    except Exception as e:
+        st.error(f"Erro no plot simples de bankroll: {e}")
 
 def odds_plot(df):
     """Gráfico de análise por faixas de odds"""
@@ -975,30 +1167,6 @@ def main():
             )
         except Exception as e:
             st.error(f"Erro ao mostrar dados detalhados: {e}")
-
-        try:
-            st.markdown("#### 🗺️ Estatísticas por Mapa")
-            if "game" in processed_df.columns:
-                game_stats = (
-                    processed_df.groupby("game")
-                    .agg(
-                        {
-                            "profit": ["sum", "count"],
-                            "status": lambda x: (x == "win").mean(),
-                        }
-                    )
-                    .round(2)
-                )
-                game_stats.columns = ["Total Profit", "Bets Count", "Win Rate"]
-
-                # Renomeia índice de "game" para "Mapa X"
-                game_stats.index = [f"Mapa {i}" for i in game_stats.index]
-
-                st.dataframe(game_stats, use_container_width=True)
-            else:
-                st.info("Coluna 'game' não encontrada nos dados")
-        except Exception as e:
-            st.error(f"Erro ao calcular estatísticas por mapa: {e}")
 
         st.markdown("---")
         st.subheader("🎯 Odds Analysis")
