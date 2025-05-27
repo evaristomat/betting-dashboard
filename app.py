@@ -448,8 +448,14 @@ def plot_simple_bankroll_evolution(df):
     except Exception as e:
         st.error(f"Erro no plot simples de bankroll: {e}")
 
-def odds_plot(df):
-    """Gráfico de análise por faixas de odds"""
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import streamlit as st
+
+
+def odds_plot(df: pd.DataFrame) -> None:
+    """Gráfico de análise por faixas de odds."""
     if len(df) == 0 or df["odds"].isna().all():
         st.warning("No odds data available for analysis.")
         return
@@ -469,7 +475,8 @@ def odds_plot(df):
     theoretical_probs = [1 / point for point in mid_points]
     grouped["total"] = grouped["win"] + grouped["loss"]
     grouped["win_ratio"] = grouped["win"] / grouped["total"].replace(
-        0, np.nan
+        0,
+        np.nan,
     )  # Use NaN para divisão por zero
     grouped["edge"] = grouped["win_ratio"] - theoretical_probs
 
@@ -481,26 +488,30 @@ def odds_plot(df):
         return
 
     plt.figure(figsize=(10, 7))
-    ax = sns.barplot(
-        x=grouped.index, y=grouped["edge"], palette="coolwarm", errorbar=None
-    )
-    ax.axhline(0, color="black", linestyle="--")
+
+    # Fix for seaborn FutureWarning - use matplotlib instead of seaborn barplot
+    colors = ["red" if x < 0 else "green" for x in grouped["edge"]]
+    plt.bar(range(len(grouped)), grouped["edge"], color=colors)
+
+    plt.axhline(0, color="black", linestyle="--")
+
     for i, value in enumerate(grouped["edge"]):
         if not np.isnan(value):
-            ax.text(
+            plt.text(
                 i,
-                value if value > 0 else 0,
+                max(0, value),  # Use max() instead of conditional
                 f"{value:.2%}",
                 ha="center",
                 va="bottom" if value > 0 else "top",
                 fontsize=10,
             )
+
     plt.title("Edge Over Theoretical Probabilities by Odds Range")
     plt.ylabel("Edge (Win Rate - Theoretical Probability)")
     plt.xlabel("Odds Range")
-    plt.xticks(rotation=45)
+    plt.xticks(range(len(grouped)), grouped.index, rotation=45)
     plt.tight_layout()
-    st.pyplot(ax.get_figure())
+    st.pyplot(plt.gcf())
 
 
 def bet_groups_plot(df):
