@@ -10,6 +10,9 @@ import seaborn as sns
 # Web application framework
 import streamlit as st
 
+import plotly.graph_objects as go
+from datetime import datetime, date
+
 # ----------------- CONFIGURATION ----------------- #
 BACKGROUND_COLOR = "#0E1117"
 PARAMS = {
@@ -327,90 +330,6 @@ def bankroll_plot(df):
         plt.tight_layout()
         st.pyplot(plt.gcf())
 
-        # ========== TABELA DE ESTATÍSTICAS DETALHADAS ==========
-        st.subheader("📊 Detailed Statistics by Game Category")
-
-        if stats_data:
-            # Criar DataFrame a partir dos dados coletados
-            stats_df = pd.DataFrame(stats_data)
-
-            display_stats = stats_df.copy()
-            display_stats["Win Rate (%)"] = display_stats["Win Rate (%)"].round(2)
-            display_stats["Total Profit"] = display_stats["Total Profit"].round(2)
-            display_stats["Avg ROI (%)"] = display_stats["Avg ROI (%)"].round(2)
-
-            st.dataframe(display_stats, use_container_width=True)
-
-            # Insights automáticos
-            st.subheader("🔍 Key Insights")
-
-            if len(display_stats) > 1:
-                # Melhor categoria por profit
-                best_profit_idx = display_stats["Total Profit"].idxmax()
-                best_profit_cat = display_stats.loc[best_profit_idx, "Category"]
-                best_profit_value = display_stats.loc[best_profit_idx, "Total Profit"]
-
-                # Melhor winrate
-                best_winrate_idx = display_stats["Win Rate (%)"].idxmax()
-                best_winrate_cat = display_stats.loc[best_winrate_idx, "Category"]
-                best_winrate_value = display_stats.loc[best_winrate_idx, "Win Rate (%)"]
-
-                col1, col2, col3 = st.columns(3)
-
-                with col1:
-                    st.metric(
-                        "🏆 Best Profit Category",
-                        best_profit_cat,
-                        f"{best_profit_value:.2f} units",
-                    )
-
-                with col2:
-                    st.metric(
-                        "🎯 Best Win Rate",
-                        best_winrate_cat,
-                        f"{best_winrate_value:.1f}%",
-                    )
-
-                with col3:
-                    total_games = len(
-                        [
-                            cat
-                            for cat in categories.keys()
-                            if "Game" in cat and cat != "All Games"
-                        ]
-                    )
-                    st.metric("🎮 Game Categories", total_games, "detected")
-
-                # Análise comparativa adicional
-                if total_games >= 2:
-                    game_categories = display_stats[
-                        display_stats["Category"].str.contains("Game ")
-                    ].copy()
-                    if len(game_categories) >= 2:
-                        st.write("**🎮 Game-by-Game Analysis:**")
-
-                        best_game_profit = game_categories.loc[
-                            game_categories["Total Profit"].idxmax()
-                        ]
-                        worst_game_profit = game_categories.loc[
-                            game_categories["Total Profit"].idxmin()
-                        ]
-
-                        col1, col2 = st.columns(2)
-                        with col1:
-                            st.success(
-                                f"📈 **Most Profitable**: {best_game_profit['Category']} with {best_game_profit['Total Profit']:.2f}U"
-                            )
-                        with col2:
-                            if worst_game_profit["Total Profit"] < 0:
-                                st.error(
-                                    f"📉 **Least Profitable**: {worst_game_profit['Category']} with {worst_game_profit['Total Profit']:.2f}U"
-                                )
-                            else:
-                                st.info(
-                                    f"📊 **Least Profitable**: {worst_game_profit['Category']} with {worst_game_profit['Total Profit']:.2f}U"
-                                )
-
     except Exception as e:
         st.error(f"Erro no gráfico de bankroll: {e}")
         # Fallback para plot simples
@@ -643,54 +562,6 @@ def profit_plot(df):
     plt.tight_layout()
     st.pyplot(ax.get_figure())
 
-
-def scatter_plot(df):
-    """Gráfico de dispersão Fair Odds vs Actual Odds"""
-    if "fair_odds" not in df.columns:
-        st.info("Coluna 'fair_odds' não encontrada. Pulando gráfico de dispersão.")
-        return
-
-    colors = df["status"].map({"win": "green", "loss": "red"})
-
-    plt.figure(figsize=(12, 6))
-    plt.scatter(df["fair_odds"], df["odds"], alpha=0.6, c=colors, s=50)
-    plt.title("Fair Odds vs Actual Odds with Win/Loss Overlay")
-    plt.xlabel("Fair Odds")
-    plt.ylabel("Actual Odds")
-
-    # Linha de referência y=x
-    max_val = max(df["fair_odds"].max(), df["odds"].max())
-    min_val = min(df["fair_odds"].min(), df["odds"].min())
-    plt.plot(
-        [min_val, max_val], [min_val, max_val], color="blue", linestyle="--", alpha=0.7
-    )
-
-    legend_elements = [
-        Line2D(
-            [0],
-            [0],
-            marker="o",
-            color="w",
-            label="Win",
-            markersize=10,
-            markerfacecolor="green",
-        ),
-        Line2D(
-            [0],
-            [0],
-            marker="o",
-            color="w",
-            label="Loss",
-            markersize=10,
-            markerfacecolor="red",
-        ),
-    ]
-    plt.legend(handles=legend_elements)
-    plt.grid(True, alpha=0.3)
-    plt.tight_layout()
-    st.pyplot(plt.gcf())
-
-
 def create_bet_type_analysis_charts(df):
     """Cria gráficos de análise por tipo de aposta usando matplotlib"""
     try:
@@ -897,7 +768,414 @@ def map_analysis_plot(df):
     plt.tight_layout()
     st.pyplot(fig)
 
+def get_melhores_apostas():
+    """
+    Pega as melhores apostas pendentes do DIA ATUAL baseado em ROI
+    """
+    try:
+        df_pending = load_pending_bets()
 
+        if len(df_pending) == 0:
+            return pd.DataFrame()
+
+        # Converte data para datetime
+        df_pending = ensure_datetime(df_pending, "date")
+
+        # Filtra apenas apostas do dia atual
+        hoje = date.today()
+        df_hoje = df_pending[df_pending["date"].dt.date == hoje].copy()
+
+        if len(df_hoje) == 0:
+            return pd.DataFrame()
+
+        df_hoje["ROI_num"] = (
+            df_hoje["ROI"].astype(str).str.replace("%", "").astype(float)
+        )
+        df_hoje["odds_num"] = pd.to_numeric(df_hoje["odds"], errors="coerce")
+        df_hoje = df_hoje.dropna(subset=["ROI_num", "odds_num"])
+        df_hoje["jogo_id"] = (
+            df_hoje["t1"].astype(str) + " vs " + df_hoje["t2"].astype(str)
+        )
+        df_hoje["score"] = df_hoje["ROI_num"]
+
+        melhores = (
+            df_hoje.groupby("jogo_id")
+            .apply(lambda x: x.nlargest(min(2, len(x)), "score"))
+            .reset_index(drop=True)
+        )
+
+        if len(melhores) > 10:
+            melhores = melhores.nlargest(10, "score")
+
+        return melhores
+
+    except Exception as e:
+        st.error(f"Erro ao carregar apostas do dia: {e}")
+        return pd.DataFrame()
+
+
+def display_apostas_do_dia():
+    """
+    Função para exibir apostas recomendadas do dia atual em formato de tabela
+    """
+    st.markdown("---")
+    st.markdown("## 🌟 Apostas Recomendadas do Dia")
+
+    melhores_apostas = get_melhores_apostas()
+
+    if len(melhores_apostas) == 0:
+        hoje = date.today()
+        st.info(
+            f"📭 Nenhuma aposta encontrada para hoje ({hoje.strftime('%d/%m/%Y')}). As apostas aparecem aqui apenas para o dia atual."
+        )
+        return
+
+    display_cols = [
+        "date",
+        "league",
+        "t1",
+        "t2",
+        "bet_type",
+        "bet_line",
+        "ROI",
+        "odds",
+        "House",
+    ]
+    available_cols = [col for col in display_cols if col in melhores_apostas.columns]
+
+    tabela_apostas = melhores_apostas[available_cols].copy()
+    tabela_apostas["Ranking"] = range(1, len(tabela_apostas) + 1)
+
+    cols_ordem = ["Ranking"] + [
+        col for col in available_cols if col in tabela_apostas.columns
+    ]
+    tabela_apostas = tabela_apostas[cols_ordem]
+
+    rename_dict = {
+        "date": "Data/Hora",
+        "league": "Liga",
+        "t1": "Time 1",
+        "t2": "Time 2",
+        "bet_type": "Tipo Aposta",
+        "bet_line": "Linha",
+        "odds": "Odd",
+        "House": "Casa",
+    }
+
+    tabela_apostas = tabela_apostas.rename(columns=rename_dict)
+
+    total_apostas = len(melhores_apostas)
+    roi_medio = melhores_apostas["ROI_num"].mean()
+    melhor_roi = melhores_apostas["ROI_num"].max()
+    hoje = date.today()
+
+    st.write(
+        f"**📅 {hoje.strftime('%d/%m/%Y')} • 📊 {total_apostas} apostas selecionadas** • ROI médio: **{roi_medio:.1f}%** • Melhor ROI: **{melhor_roi:.1f}%**"
+    )
+
+    st.dataframe(tabela_apostas, use_container_width=True, hide_index=True, height=400)
+
+def display_key_insights(df):
+    """
+    Exibe insights automáticos baseados nos dados de apostas
+    """
+    if len(df) == 0:
+        return
+
+    st.markdown("---")
+    st.subheader("🔍 Key Insights")
+
+    try:
+        # ===== ANÁLISES PRINCIPAIS =====
+
+        # 1. Liga mais lucrativa
+        liga_stats = (
+            df.groupby("league")
+            .agg({"profit": ["sum", "count"], "status": lambda x: (x == "win").mean()})
+            .round(2)
+        )
+        liga_stats.columns = ["Total_Profit", "Total_Bets", "Win_Rate"]
+        liga_stats = liga_stats[liga_stats["Total_Bets"] >= 3]  # Mínimo 3 apostas
+
+        if len(liga_stats) > 0:
+            melhor_liga = liga_stats.loc[liga_stats["Total_Profit"].idxmax()]
+            melhor_liga_nome = liga_stats["Total_Profit"].idxmax()
+
+        # 2. Time mais lucrativo (combinando t1 e t2)
+        times_t1 = df.groupby("t1")["profit"].sum()
+        times_t2 = df.groupby("t2")["profit"].sum()
+
+        # Combina profits de quando o time é t1 ou t2
+        all_teams = set(df["t1"].unique()) | set(df["t2"].unique())
+        team_profits = {}
+        for team in all_teams:
+            profit_t1 = times_t1.get(team, 0)
+            profit_t2 = times_t2.get(team, 0)
+            team_profits[team] = profit_t1 + profit_t2
+
+        if team_profits:
+            melhor_time = max(team_profits, key=team_profits.get)
+            melhor_time_profit = team_profits[melhor_time]
+
+        # 3. Tipo de aposta mais lucrativo
+        bet_type_stats = (
+            df.groupby("bet_type")
+            .agg({"profit": ["sum", "count"], "status": lambda x: (x == "win").mean()})
+            .round(2)
+        )
+        bet_type_stats.columns = ["Total_Profit", "Total_Bets", "Win_Rate"]
+        bet_type_stats = bet_type_stats[bet_type_stats["Total_Bets"] >= 3]
+
+        if len(bet_type_stats) > 0:
+            melhor_bet_type = bet_type_stats.loc[
+                bet_type_stats["Total_Profit"].idxmax()
+            ]
+            melhor_bet_type_nome = bet_type_stats["Total_Profit"].idxmax()
+
+        # 4. Casa de apostas mais lucrativa
+        house_stats = (
+            df.groupby("House")
+            .agg({"profit": ["sum", "count"], "status": lambda x: (x == "win").mean()})
+            .round(2)
+        )
+        house_stats.columns = ["Total_Profit", "Total_Bets", "Win_Rate"]
+        house_stats = house_stats[house_stats["Total_Bets"] >= 3]
+
+        if len(house_stats) > 0:
+            melhor_house = house_stats.loc[house_stats["Total_Profit"].idxmax()]
+            melhor_house_nome = house_stats["Total_Profit"].idxmax()
+
+        # 5. Faixa de ROI mais eficiente
+        df["roi_range"] = pd.cut(
+            df["ROI"],
+            bins=[0, 5, 10, 15, 20, 100],
+            labels=["0-5%", "5-10%", "10-15%", "15-20%", "20%+"],
+        )
+        roi_stats = (
+            df.groupby("roi_range")
+            .agg({"profit": ["sum", "count"], "status": lambda x: (x == "win").mean()})
+            .round(2)
+        )
+        roi_stats.columns = ["Total_Profit", "Total_Bets", "Win_Rate"]
+        roi_stats = roi_stats.dropna()
+
+        if len(roi_stats) > 0:
+            melhor_roi_range = roi_stats.loc[roi_stats["Total_Profit"].idxmax()]
+            melhor_roi_range_nome = roi_stats["Total_Profit"].idxmax()
+
+        # ===== DISPLAY DOS INSIGHTS =====
+
+        # Primeira linha de métricas
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            if len(liga_stats) > 0:
+                st.metric(
+                    "🏆 Liga Mais Lucrativa",
+                    melhor_liga_nome,
+                    f"{melhor_liga['Total_Profit']:.2f}U",
+                    help=f"Win Rate: {melhor_liga['Win_Rate']:.1%} | {melhor_liga['Total_Bets']:.0f} apostas",
+                )
+            else:
+                st.metric("🏆 Liga Mais Lucrativa", "N/A", "0.00U")
+
+        with col2:
+            if team_profits:
+                st.metric(
+                    "⭐ Time Mais Lucrativo",
+                    melhor_time,
+                    f"{melhor_time_profit:.2f}U",
+                    help="Soma dos lucros quando este time participa",
+                )
+            else:
+                st.metric("⭐ Time Mais Lucrativo", "N/A", "0.00U")
+
+        with col3:
+            if len(bet_type_stats) > 0:
+                st.metric(
+                    "🎯 Tipo Aposta Top",
+                    melhor_bet_type_nome,
+                    f"{melhor_bet_type['Total_Profit']:.2f}U",
+                    help=f"Win Rate: {melhor_bet_type['Win_Rate']:.1%} | {melhor_bet_type['Total_Bets']:.0f} apostas",
+                )
+            else:
+                st.metric("🎯 Tipo Aposta Top", "N/A", "0.00U")
+
+        with col4:
+            if len(house_stats) > 0:
+                st.metric(
+                    "🏠 Casa Mais Lucrativa",
+                    melhor_house_nome,
+                    f"{melhor_house['Total_Profit']:.2f}U",
+                    help=f"Win Rate: {melhor_house['Win_Rate']:.1%} | {melhor_house['Total_Bets']:.0f} apostas",
+                )
+            else:
+                st.metric("🏠 Casa Mais Lucrativa", "N/A", "0.00U")
+
+        # Segunda linha de métricas
+        col1, col2, col3, col4 = st.columns(4)
+
+        with col1:
+            if len(roi_stats) > 0:
+                st.metric(
+                    "📊 ROI Range Ideal",
+                    melhor_roi_range_nome,
+                    f"{melhor_roi_range['Total_Profit']:.2f}U",
+                    help=f"Win Rate: {melhor_roi_range['Win_Rate']:.1%} | {melhor_roi_range['Total_Bets']:.0f} apostas",
+                )
+            else:
+                st.metric("📊 ROI Range Ideal", "N/A", "0.00U")
+
+        with col2:
+            # Streak atual
+            df_sorted = df.sort_values(["date", "game"]).reset_index(drop=True)
+            current_streak = 0
+            streak_type = ""
+
+            if len(df_sorted) > 0:
+                last_status = df_sorted.iloc[-1]["status"]
+                for i in range(len(df_sorted) - 1, -1, -1):
+                    if df_sorted.iloc[i]["status"] == last_status:
+                        current_streak += 1
+                    else:
+                        break
+                streak_type = "W" if last_status == "win" else "L"
+
+            st.metric(
+                "🔥 Streak Atual",
+                f"{current_streak}{streak_type}",
+                f"{'🟢' if streak_type == 'W' else '🔴'}",
+                help="Sequência atual de vitórias (W) ou derrotas (L)",
+            )
+
+        with col3:
+            # Melhor mês
+            if "date" in df.columns and not df["date"].isna().all():
+                df["month_year"] = df["date"].dt.strftime("%m/%Y")
+                month_stats = (
+                    df.groupby("month_year")["profit"]
+                    .sum()
+                    .sort_values(ascending=False)
+                )
+                if len(month_stats) > 0:
+                    melhor_mes = month_stats.index[0]
+                    melhor_mes_profit = month_stats.iloc[0]
+                    st.metric(
+                        "📅 Melhor Mês",
+                        melhor_mes,
+                        f"{melhor_mes_profit:.2f}U",
+                        help="Mês com maior lucro total",
+                    )
+                else:
+                    st.metric("📅 Melhor Mês", "N/A", "0.00U")
+            else:
+                st.metric("📅 Melhor Mês", "N/A", "0.00U")
+
+        with col4:
+            # Odds sweet spot
+            df["odds_range"] = pd.cut(
+                df["odds"],
+                bins=[1, 1.5, 2, 2.5, 3, 10],
+                labels=["1.0-1.5", "1.5-2.0", "2.0-2.5", "2.5-3.0", "3.0+"],
+            )
+            odds_stats = (
+                df.groupby("odds_range")
+                .agg({"profit": "sum", "status": lambda x: (x == "win").mean()})
+                .round(2)
+            )
+            odds_stats = odds_stats.dropna()
+
+            if len(odds_stats) > 0:
+                melhor_odds_range = odds_stats.loc[odds_stats["profit"].idxmax()]
+                melhor_odds_range_nome = odds_stats["profit"].idxmax()
+                st.metric(
+                    "🎲 Odds Sweet Spot",
+                    melhor_odds_range_nome,
+                    f"{melhor_odds_range['profit']:.2f}U",
+                    help=f"Win Rate: {melhor_odds_range['status']:.1%}",
+                )
+            else:
+                st.metric("🎲 Odds Sweet Spot", "N/A", "0.00U")
+
+        # ===== ANÁLISES DETALHADAS =====
+
+        # Tabelas de top performers
+        st.markdown("### 📋 Top Performers Detalhado")
+
+        col1, col2 = st.columns(2)
+
+        with col1:
+            st.markdown("**🏆 Top 5 Ligas por Lucro**")
+            if len(liga_stats) > 0:
+                top_ligas = liga_stats.nlargest(5, "Total_Profit")[
+                    ["Total_Profit", "Win_Rate", "Total_Bets"]
+                ]
+                top_ligas.columns = ["Lucro (U)", "Win Rate", "Apostas"]
+                top_ligas["Win Rate"] = top_ligas["Win Rate"].apply(
+                    lambda x: f"{x:.1%}"
+                )
+                top_ligas["Apostas"] = top_ligas["Apostas"].astype(int)
+                st.dataframe(top_ligas, use_container_width=True)
+            else:
+                st.info("Dados insuficientes")
+
+        with col2:
+            st.markdown("**⭐ Top 5 Times por Lucro**")
+            if team_profits:
+                top_teams_df = pd.DataFrame(
+                    list(team_profits.items()), columns=["Time", "Lucro"]
+                )
+                top_teams_df = top_teams_df.nlargest(5, "Lucro").set_index("Time")
+                top_teams_df.columns = ["Lucro (U)"]
+                st.dataframe(top_teams_df, use_container_width=True)
+            else:
+                st.info("Dados insuficientes")
+
+        # Insights adicionais em texto
+        st.markdown("### 💡 Insights Automáticos")
+
+        insights = []
+
+        # Insight sobre consistency
+        if len(liga_stats) > 0:
+            consistent_leagues = liga_stats[liga_stats["Win_Rate"] >= 0.6]
+            if len(consistent_leagues) > 0:
+                best_consistent = consistent_leagues.loc[
+                    consistent_leagues["Total_Profit"].idxmax()
+                ]
+                insights.append(
+                    f"🎯 **Liga mais consistente**: {consistent_leagues['Total_Profit'].idxmax()} com {best_consistent['Win_Rate']:.1%} de win rate e {best_consistent['Total_Profit']:.2f}U de lucro"
+                )
+
+        # Insight sobre ROI vs Volume
+        if len(roi_stats) > 1:
+            high_volume_roi = roi_stats[
+                roi_stats["Total_Bets"] >= roi_stats["Total_Bets"].median()
+            ]
+            if len(high_volume_roi) > 0:
+                best_volume_roi = high_volume_roi.loc[
+                    high_volume_roi["Total_Profit"].idxmax()
+                ]
+                insights.append(
+                    f"📊 **Melhor ROI com alto volume**: {high_volume_roi['Total_Profit'].idxmax()} com {best_volume_roi['Total_Bets']:.0f} apostas e {best_volume_roi['Total_Profit']:.2f}U"
+                )
+
+        # Insight sobre houses
+        if len(house_stats) > 1:
+            reliable_houses = house_stats[house_stats["Win_Rate"] >= 0.5]
+            if len(reliable_houses) > 0:
+                insights.append(
+                    f"🏠 **Casas mais confiáveis**: {len(reliable_houses)} casas com win rate ≥ 50%"
+                )
+
+        for insight in insights:
+            st.markdown(f"- {insight}")
+
+        if not insights:
+            st.info("Execute mais apostas para gerar insights automáticos detalhados.")
+
+    except Exception as e:
+        st.error(f"Erro ao gerar insights: {e}")
 # ----------------- MAIN APPLICATION LOGIC ----------------- #
 def main():
     try:
@@ -1031,9 +1309,9 @@ def main():
             else:
                 chosen_roi = st.slider(
                     "Choose Minimum ROI (%)",
-                    int(min_available_roi),
+                    int(10),
                     int(max_available_roi),
-                    int(min_available_roi),
+                    int(10),
                 )
         except Exception as e:
             st.error(f"Erro no filtro de ROI: {e}")
@@ -1068,6 +1346,10 @@ def main():
             bankroll_plot(processed_df)
         except Exception as e:
             st.error(f"Erro no gráfico de bankroll: {e}")
+
+        display_key_insights(processed_df)    
+
+        display_apostas_do_dia()
 
         # Seção de Apostas em Vigor
         st.markdown("---")
@@ -1203,14 +1485,7 @@ def main():
         except Exception as e:
             st.error(f"Erro no gráfico de mapas: {e}")
 
-        st.markdown("---")
-        st.subheader("⚖️ Fair vs Actual Odds")
-        try:
-            scatter_plot(processed_df)
-        except Exception as e:
-            st.error(f"Erro no gráfico scatter: {e}")
-
-
+        
     except Exception as e:
         st.error(f"An unexpected error occurred: {e}")
 
