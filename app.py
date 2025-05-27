@@ -74,7 +74,7 @@ def ensure_datetime(df, date_column="date"):
     return df
 
 
-@st.cache_data
+#@st.cache_data
 def load_pending_bets():
     """Carrega apostas pendentes do arquivo bets.csv"""
     try:
@@ -100,7 +100,7 @@ def load_pending_bets():
         return pd.DataFrame()
 
 
-@st.cache_data
+#@st.cache_data
 def load_data():
     """Carrega dados das apostas processadas"""
     try:
