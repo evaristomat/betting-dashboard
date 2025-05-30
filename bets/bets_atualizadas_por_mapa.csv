@@ -223,6 +223,15 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 28 Mai 2025 13:00,LFL,Gentle Mates,BK ROG Esports,over,total_barons 1.5,1.0,33.55%,2.62,3.5,BET365,url não disponível,loss,,-1.0,2
 28 Mai 2025 13:00,LFL,Gentle Mates,BK ROG Esports,over,total_barons 1.5,2.0,33.55%,2.62,3.5,BET365,url não disponível,win,,2.5,3
 28 Mai 2025 13:00,LFL,Gentle Mates,BK ROG Esports,over,total_barons 1.5,1.0,33.55%,2.62,3.5,BET365,url não disponível,loss,,-1.0,4
+30 Mai 2025 12:00,TCL,Misa Esports,BoostGate Esports,under,total_dragons 4.5,5.0,12.74%,1.86,2.1,BET365,url não disponível,loss,,-1.0,1
+30 Mai 2025 12:00,TCL,Misa Esports,BoostGate Esports,under,total_dragons 4.5,4.0,12.74%,1.86,2.1,BET365,url não disponível,win,,1.1,2
+30 Mai 2025 12:00,TCL,Misa Esports,BoostGate Esports,under,total_dragons 4.5,5.0,12.74%,1.86,2.1,BET365,url não disponível,loss,,-1.0,3
+30 Mai 2025 12:00,TCL,Misa Esports,BoostGate Esports,over,total_kills 36.5,58.0,11.41%,1.64,1.83,BET365,url não disponível,win,,0.83,1
+30 Mai 2025 12:00,TCL,Misa Esports,BoostGate Esports,over,total_kills 36.5,30.0,11.41%,1.64,1.83,BET365,url não disponível,loss,,-1.0,2
+30 Mai 2025 12:00,TCL,Misa Esports,BoostGate Esports,over,total_kills 36.5,29.0,11.41%,1.64,1.83,BET365,url não disponível,loss,,-1.0,3
+30 Mai 2025 12:00,TCL,Misa Esports,BoostGate Esports,under,total_inhibitors 1.5,1.0,17.89%,1.7,2.0,BET365,url não disponível,win,,1.0,1
+30 Mai 2025 12:00,TCL,Misa Esports,BoostGate Esports,under,total_inhibitors 1.5,1.0,17.89%,1.7,2.0,BET365,url não disponível,win,,1.0,2
+30 Mai 2025 12:00,TCL,Misa Esports,BoostGate Esports,under,total_inhibitors 1.5,1.0,17.89%,1.7,2.0,BET365,url não disponível,win,,1.0,3
 27 Mai 2025 10:00,VCS,Saigon Dino,Mila Gaming,over,total_dragons 4.5,4.0,10.27%,2.15,2.37,BET365,url não disponível,loss,,-1.0,1
 27 Mai 2025 10:00,VCS,Saigon Dino,Mila Gaming,under,total_kills 36.5,40.0,6.75%,1.71,1.83,BET365,url não disponível,loss,,-1.0,1
 27 Mai 2025 10:00,VCS,Saigon Dino,Mila Gaming,under,total_inhibitors 1.5,2.0,18.75%,1.6,1.9,BET365,url não disponível,loss,,-1.0,1
@@ -281,3 +290,17 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 29 Mai 2025 07:00,VCS,Never Give Up,Mila Gaming,under,total_inhibitors 1.5,3.0,18.53%,1.54,1.83,BET365,url não disponível,loss,,-1.0,1
 29 Mai 2025 07:00,VCS,Never Give Up,Mila Gaming,under,total_inhibitors 1.5,2.0,18.53%,1.54,1.83,BET365,url não disponível,loss,,-1.0,2
 29 Mai 2025 07:00,VCS,Never Give Up,Mila Gaming,under,total_inhibitors 1.5,3.0,18.53%,1.54,1.83,BET365,url não disponível,loss,,-1.0,3
+29 Mai 2025 13:00,PRM,Kaufland Hangry Knights,ROSSMANN Centaurs,under,game_duration 31.5,30.43,18.95%,1.54,1.83,BET365,url não disponível,win,,0.83,1
+29 Mai 2025 13:00,PRM,Kaufland Hangry Knights,ROSSMANN Centaurs,under,game_duration 31.5,40.57,18.95%,1.54,1.83,BET365,url não disponível,loss,,-1.0,2
+29 Mai 2025 13:00,PRM,Kaufland Hangry Knights,ROSSMANN Centaurs,under,game_duration 31.5,36.68,18.95%,1.54,1.83,BET365,url não disponível,loss,,-1.0,3
+29 Mai 2025 13:00,PRM,Kaufland Hangry Knights,ROSSMANN Centaurs,under,game_duration 31.5,36.72,18.95%,1.54,1.83,BET365,url não disponível,loss,,-1.0,4
+29 Mai 2025 13:00,PRM,Kaufland Hangry Knights,ROSSMANN Centaurs,under,game_duration 31.5,26.65,18.95%,1.54,1.83,BET365,url não disponível,win,,0.83,5
+30 Mai 2025 02:00,LCKC,DN Freecs Challengers,OKSavingsBank BRION Challengers,under,game_duration 34.5,43.1,14.38%,1.6,1.83,BET365,url não disponível,loss,,-1.0,1
+30 Mai 2025 02:00,LCKC,DN Freecs Challengers,OKSavingsBank BRION Challengers,under,game_duration 34.5,26.15,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,2
+30 Mai 2025 02:00,LCKC,DN Freecs Challengers,OKSavingsBank BRION Challengers,under,game_duration 34.5,35.9,14.38%,1.6,1.83,BET365,url não disponível,loss,,-1.0,3
+30 Mai 2025 09:00,LCP,GAM Esports,MGN Vikings Esports,under,game_duration 32.5,44.35,18.41%,1.55,1.83,BET365,url não disponível,loss,,-1.0,1
+30 Mai 2025 09:00,LCP,GAM Esports,MGN Vikings Esports,under,game_duration 32.5,45.07,18.41%,1.55,1.83,BET365,url não disponível,loss,,-1.0,2
+30 Mai 2025 09:00,LCP,GAM Esports,MGN Vikings Esports,under,game_duration 32.5,40.0,18.41%,1.55,1.83,BET365,url não disponível,loss,,-1.0,3
+30 Mai 2025 09:00,LCP,GAM Esports,MGN Vikings Esports,under,total_barons 1.5,2.0,17.65%,1.06,1.25,BET365,url não disponível,loss,,-1.0,1
+30 Mai 2025 09:00,LCP,GAM Esports,MGN Vikings Esports,under,total_barons 1.5,2.0,17.65%,1.06,1.25,BET365,url não disponível,loss,,-1.0,2
+30 Mai 2025 09:00,LCP,GAM Esports,MGN Vikings Esports,under,total_barons 1.5,1.0,17.65%,1.06,1.25,BET365,url não disponível,win,,0.25,3
