@@ -11,7 +11,7 @@ import seaborn as sns
 import streamlit as st
 
 import plotly.graph_objects as go
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 
 # ----------------- CONFIGURATION ----------------- #
 BACKGROUND_COLOR = "#0E1117"
@@ -77,7 +77,7 @@ def ensure_datetime(df, date_column="date"):
     return df
 
 
-#@st.cache_data
+# @st.cache_data
 def load_pending_bets():
     """Carrega apostas pendentes do arquivo bets.csv"""
     try:
@@ -103,7 +103,7 @@ def load_pending_bets():
         return pd.DataFrame()
 
 
-#@st.cache_data
+# @st.cache_data
 def load_data():
     """Carrega dados das apostas processadas"""
     try:
@@ -215,6 +215,7 @@ def display_summary(df, roi_value):
 
     except Exception as e:
         st.error(f"Erro no cálculo do resumo: {e}")
+
 
 def bankroll_plot(df):
     """Gráfico de evolução do bankroll geral e por games"""
@@ -367,66 +368,198 @@ def plot_simple_bankroll_evolution(df):
     except Exception as e:
         st.error(f"Erro no plot simples de bankroll: {e}")
 
+
 def odds_plot(df: pd.DataFrame) -> None:
-    """Gráfico de análise por faixas de odds."""
+    """Gráfico de lucratividade por faixas de odds específicas."""
     if len(df) == 0 or df["odds"].isna().all():
         st.warning("No odds data available for analysis.")
         return
 
-    bins = [1.4, 1.6, 1.8, 2, 2.2, 2.4, 2.6, 2.8, 3]
-    df["odds_bin"] = pd.cut(df["odds"], bins)
-    grouped = (
-        df.groupby(["odds_bin", "status"], observed=False).size().unstack().fillna(0)
-    )
+    # Definir as faixas de odds - Opção 5: Simples e Clara
+    def categorize_odds(odd_value):
+        if pd.isna(odd_value):
+            return "Unknown"
+        elif odd_value < 1.5:
+            return "< 1.5"
+        elif 1.5 <= odd_value < 2.0:
+            return "1.5 - 1.99"
+        elif 2.0 <= odd_value < 2.5:
+            return "2.0 - 2.49"
+        elif 2.5 <= odd_value < 3.0:
+            return "2.5 - 2.99"
+        else:
+            return "≥ 3.0"
 
-    if "win" not in grouped:
-        grouped["win"] = 0
-    if "loss" not in grouped:
-        grouped["loss"] = 0
+    # Aplicar categorização
+    df = df.copy()
+    df["odds_category"] = df["odds"].apply(categorize_odds)
 
-    mid_points = [(bins[i] + bins[i + 1]) / 2 for i in range(len(bins) - 1)]
-    theoretical_probs = [1 / point for point in mid_points]
-    grouped["total"] = grouped["win"] + grouped["loss"]
-    grouped["win_ratio"] = grouped["win"] / grouped["total"].replace(
-        0,
-        np.nan,
-    )  # Use NaN para divisão por zero
-    grouped["edge"] = grouped["win_ratio"] - theoretical_probs
+    # Remover categoria "Unknown" se existir
+    df = df[df["odds_category"] != "Unknown"]
 
-    # Remove linhas com NaN
-    grouped = grouped.dropna(subset=["edge"])
-
-    if len(grouped) == 0:
-        st.warning("No valid data for odds analysis.")
+    if len(df) == 0:
+        st.warning("No valid odds data after categorization.")
         return
 
-    plt.figure(figsize=(10, 7))
+    # Calcular estatísticas por categoria
+    odds_stats = (
+        df.groupby("odds_category")
+        .agg(
+            {
+                "profit": ["sum", "count", "mean"],
+                "status": lambda x: (x == "win").mean(),
+                "odds": "mean",
+            }
+        )
+        .round(3)
+    )
 
-    # Fix for seaborn FutureWarning - use matplotlib instead of seaborn barplot
-    colors = ["red" if x < 0 else "green" for x in grouped["edge"]]
-    plt.bar(range(len(grouped)), grouped["edge"], color=colors)
+    # Flatten column names
+    odds_stats.columns = [
+        "Total_Profit",
+        "Total_Bets",
+        "Avg_Profit_Per_Bet",
+        "Win_Rate",
+        "Avg_Odds",
+    ]
 
-    plt.axhline(0, color="black", linestyle="--")
+    # Ordenar categorias de forma lógica
+    category_order = ["< 1.5", "1.5 - 1.99", "2.0 - 2.49", "2.5 - 2.99", "≥ 3.0"]
 
-    for i, value in enumerate(grouped["edge"]):
-        if not np.isnan(value):
-            plt.text(
-                i,
-                max(0, value),
-                f"{value:.2%}",
-                ha="center",
-                va="bottom" if value > 0 else "top",
-                fontsize=10,
-            )
+    # Filtrar apenas categorias que existem nos dados
+    existing_categories = [cat for cat in category_order if cat in odds_stats.index]
+    odds_stats = odds_stats.reindex(existing_categories)
 
-    plt.title("Edge Over Theoretical Probabilities by Odds Range")
-    plt.ylabel("Edge (Win Rate - Theoretical Probability)")
-    plt.xlabel("Odds Range")
-    plt.xticks(range(len(grouped)), grouped.index, rotation=45)
+    # Remover linhas com NaN
+    odds_stats = odds_stats.dropna()
+
+    if len(odds_stats) == 0:
+        st.warning("No valid data for odds profitability analysis.")
+        return
+
+    # Criar figura com subplots
+    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 12))
+    fig.suptitle("Profitability Analysis by Odds Range", fontsize=16, fontweight="bold")
+
+    # 1. Total Profit por categoria
+    colors = ["green" if x >= 0 else "red" for x in odds_stats["Total_Profit"]]
+    bars1 = ax1.bar(
+        range(len(odds_stats)), odds_stats["Total_Profit"], color=colors, alpha=0.7
+    )
+    ax1.set_title("Total Profit by Odds Range")
+    ax1.set_ylabel("Total Profit (U)")
+    ax1.set_xticks(range(len(odds_stats)))
+    ax1.set_xticklabels(odds_stats.index, rotation=45)
+    ax1.grid(True, alpha=0.3)
+    ax1.axhline(0, color="black", linestyle="--", alpha=0.5)
+
+    # Anotar valores
+    for i, bar in enumerate(bars1):
+        height = bar.get_height()
+        ax1.text(
+            bar.get_x() + bar.get_width() / 2.0,
+            height,
+            f"{height:.2f}U",
+            ha="center",
+            va="bottom" if height >= 0 else "top",
+        )
+
+    # 2. Win Rate por categoria
+    bars2 = ax2.bar(
+        range(len(odds_stats)), odds_stats["Win_Rate"], color="skyblue", alpha=0.7
+    )
+    ax2.set_title("Win Rate by Odds Range")
+    ax2.set_ylabel("Win Rate")
+    ax2.set_xticks(range(len(odds_stats)))
+    ax2.set_xticklabels(odds_stats.index, rotation=45)
+    ax2.grid(True, alpha=0.3)
+    ax2.set_ylim(0, 1)
+
+    # Anotar percentuais
+    for i, bar in enumerate(bars2):
+        height = bar.get_height()
+        ax2.text(
+            bar.get_x() + bar.get_width() / 2.0,
+            height,
+            f"{height:.1%}",
+            ha="center",
+            va="bottom",
+        )
+
+    # 3. Lucro médio por aposta
+    colors3 = ["green" if x >= 0 else "red" for x in odds_stats["Avg_Profit_Per_Bet"]]
+    bars3 = ax3.bar(
+        range(len(odds_stats)),
+        odds_stats["Avg_Profit_Per_Bet"],
+        color=colors3,
+        alpha=0.7,
+    )
+    ax3.set_title("Average Profit per Bet")
+    ax3.set_ylabel("Avg Profit per Bet (U)")
+    ax3.set_xticks(range(len(odds_stats)))
+    ax3.set_xticklabels(odds_stats.index, rotation=45)
+    ax3.grid(True, alpha=0.3)
+    ax3.axhline(0, color="black", linestyle="--", alpha=0.5)
+
+    # Anotar valores
+    for i, bar in enumerate(bars3):
+        height = bar.get_height()
+        ax3.text(
+            bar.get_x() + bar.get_width() / 2.0,
+            height,
+            f"{height:.3f}U",
+            ha="center",
+            va="bottom" if height >= 0 else "top",
+        )
+
+    # 4. Número de apostas por categoria
+    bars4 = ax4.bar(
+        range(len(odds_stats)), odds_stats["Total_Bets"], color="orange", alpha=0.7
+    )
+    ax4.set_title("Number of Bets by Odds Range")
+    ax4.set_ylabel("Number of Bets")
+    ax4.set_xticks(range(len(odds_stats)))
+    ax4.set_xticklabels(odds_stats.index, rotation=45)
+    ax4.grid(True, alpha=0.3)
+
+    # Anotar valores
+    for i, bar in enumerate(bars4):
+        height = bar.get_height()
+        ax4.text(
+            bar.get_x() + bar.get_width() / 2.0,
+            height,
+            f"{int(height)}",
+            ha="center",
+            va="bottom",
+        )
+
     plt.tight_layout()
-    fig = plt.gcf()
     st.pyplot(fig)
-    plt.close()
+
+    # Exibir tabela de estatísticas
+    st.markdown("### 📊 Detailed Statistics by Odds Range")
+
+    # Preparar tabela para exibição
+    display_stats = odds_stats.copy()
+    display_stats["Win_Rate"] = display_stats["Win_Rate"].apply(lambda x: f"{x:.1%}")
+    display_stats["Total_Profit"] = display_stats["Total_Profit"].apply(
+        lambda x: f"{x:.2f}U"
+    )
+    display_stats["Avg_Profit_Per_Bet"] = display_stats["Avg_Profit_Per_Bet"].apply(
+        lambda x: f"{x:.3f}U"
+    )
+    display_stats["Avg_Odds"] = display_stats["Avg_Odds"].apply(lambda x: f"{x:.2f}")
+    display_stats["Total_Bets"] = display_stats["Total_Bets"].astype(int)
+
+    display_stats.columns = [
+        "Total Profit",
+        "Total Bets",
+        "Avg Profit/Bet",
+        "Win Rate",
+        "Avg Odds",
+    ]
+
+    st.dataframe(display_stats, use_container_width=True)
 
 
 def bet_groups_plot(df):
@@ -561,6 +694,7 @@ def profit_plot(df):
 
     plt.tight_layout()
     st.pyplot(ax.get_figure())
+
 
 def create_bet_type_analysis_charts(df):
     """Cria gráficos de análise por tipo de aposta usando matplotlib"""
@@ -768,6 +902,7 @@ def map_analysis_plot(df):
     plt.tight_layout()
     st.pyplot(fig)
 
+
 def get_melhores_apostas():
     """
     Pega as melhores apostas pendentes do DIA ATUAL baseado em ROI
@@ -811,6 +946,52 @@ def get_melhores_apostas():
 
     except Exception as e:
         st.error(f"Erro ao carregar apostas do dia: {e}")
+        return pd.DataFrame()
+
+
+def get_apostas_amanha():
+    """
+    Pega as melhores apostas pendentes para AMANHÃ baseado em ROI
+    """
+    try:
+        df_pending = load_pending_bets()
+
+        if len(df_pending) == 0:
+            return pd.DataFrame()
+
+        # Converte data para datetime
+        df_pending = ensure_datetime(df_pending, "date")
+
+        # Filtra apenas apostas de amanhã
+        amanha = date.today() + timedelta(days=1)
+        df_amanha = df_pending[df_pending["date"].dt.date == amanha].copy()
+
+        if len(df_amanha) == 0:
+            return pd.DataFrame()
+
+        df_amanha["ROI_num"] = (
+            df_amanha["ROI"].astype(str).str.replace("%", "").astype(float)
+        )
+        df_amanha["odds_num"] = pd.to_numeric(df_amanha["odds"], errors="coerce")
+        df_amanha = df_amanha.dropna(subset=["ROI_num", "odds_num"])
+        df_amanha["jogo_id"] = (
+            df_amanha["t1"].astype(str) + " vs " + df_amanha["t2"].astype(str)
+        )
+        df_amanha["score"] = df_amanha["ROI_num"]
+
+        melhores = (
+            df_amanha.groupby("jogo_id")
+            .apply(lambda x: x.nlargest(min(2, len(x)), "score"))
+            .reset_index(drop=True)
+        )
+
+        if len(melhores) > 10:
+            melhores = melhores.nlargest(10, "score")
+
+        return melhores
+
+    except Exception as e:
+        st.error(f"Erro ao carregar apostas de amanhã: {e}")
         return pd.DataFrame()
 
 
@@ -874,6 +1055,69 @@ def display_apostas_do_dia():
     )
 
     st.dataframe(tabela_apostas, use_container_width=True, hide_index=True, height=400)
+
+
+def display_apostas_amanha():
+    """
+    Função para exibir apostas recomendadas de amanhã em formato de tabela
+    """
+    st.markdown("---")
+    st.markdown("## 🌅 Apostas Recomendadas para Amanhã")
+
+    apostas_amanha = get_apostas_amanha()
+
+    if len(apostas_amanha) == 0:
+        amanha = date.today() + timedelta(days=1)
+        st.info(
+            f"📭 Nenhuma aposta encontrada para amanhã ({amanha.strftime('%d/%m/%Y')})."
+        )
+        return
+
+    display_cols = [
+        "date",
+        "league",
+        "t1",
+        "t2",
+        "bet_type",
+        "bet_line",
+        "ROI",
+        "odds",
+        "House",
+    ]
+    available_cols = [col for col in display_cols if col in apostas_amanha.columns]
+
+    tabela_apostas = apostas_amanha[available_cols].copy()
+    tabela_apostas["Ranking"] = range(1, len(tabela_apostas) + 1)
+
+    cols_ordem = ["Ranking"] + [
+        col for col in available_cols if col in tabela_apostas.columns
+    ]
+    tabela_apostas = tabela_apostas[cols_ordem]
+
+    rename_dict = {
+        "date": "Data/Hora",
+        "league": "Liga",
+        "t1": "Time 1",
+        "t2": "Time 2",
+        "bet_type": "Tipo Aposta",
+        "bet_line": "Linha",
+        "odds": "Odd",
+        "House": "Casa",
+    }
+
+    tabela_apostas = tabela_apostas.rename(columns=rename_dict)
+
+    total_apostas = len(apostas_amanha)
+    roi_medio = apostas_amanha["ROI_num"].mean()
+    melhor_roi = apostas_amanha["ROI_num"].max()
+    amanha = date.today() + timedelta(days=1)
+
+    st.write(
+        f"**📅 {amanha.strftime('%d/%m/%Y')} • 📊 {total_apostas} apostas selecionadas** • ROI médio: **{roi_medio:.1f}%** • Melhor ROI: **{melhor_roi:.1f}%**"
+    )
+
+    st.dataframe(tabela_apostas, use_container_width=True, hide_index=True, height=400)
+
 
 def display_key_insights(df):
     """
@@ -1072,12 +1316,22 @@ def display_key_insights(df):
                 st.metric("📅 Melhor Mês", "N/A", "0.00U")
 
         with col4:
-            # Odds sweet spot
-            df["odds_range"] = pd.cut(
-                df["odds"],
-                bins=[1, 1.5, 2, 2.5, 3, 10],
-                labels=["1.0-1.5", "1.5-2.0", "2.0-2.5", "2.5-3.0", "3.0+"],
-            )
+            # Odds sweet spot - usando mesma categorização do gráfico principal
+            def categorize_odds_insights(odd_value):
+                if pd.isna(odd_value):
+                    return None
+                elif odd_value < 1.5:
+                    return "< 1.5"
+                elif 1.5 <= odd_value < 2.0:
+                    return "1.5 - 1.99"
+                elif 2.0 <= odd_value < 2.5:
+                    return "2.0 - 2.49"
+                elif 2.5 <= odd_value < 3.0:
+                    return "2.5 - 2.99"
+                else:
+                    return "≥ 3.0"
+
+            df["odds_range"] = df["odds"].apply(categorize_odds_insights)
             odds_stats = (
                 df.groupby("odds_range")
                 .agg({"profit": "sum", "status": lambda x: (x == "win").mean()})
@@ -1176,6 +1430,8 @@ def display_key_insights(df):
 
     except Exception as e:
         st.error(f"Erro ao gerar insights: {e}")
+
+
 # ----------------- MAIN APPLICATION LOGIC ----------------- #
 def main():
     try:
@@ -1347,9 +1603,11 @@ def main():
         except Exception as e:
             st.error(f"Erro no gráfico de bankroll: {e}")
 
-        display_key_insights(processed_df)    
+        display_key_insights(processed_df)
 
         display_apostas_do_dia()
+
+        display_apostas_amanha()
 
         # Seção de Apostas em Vigor
         st.markdown("---")
@@ -1360,24 +1618,28 @@ def main():
             all_bets = (
                 load_pending_bets()
             )  # Assumindo que esta função carrega o CSV completo
-            
+
             # Filtra apenas apostas com status 'pending'
-            pending_bets = all_bets[all_bets['status'] == 'pending'].copy()
+            pending_bets = all_bets[all_bets["status"] == "pending"].copy()
 
             if len(pending_bets) > 0:
                 # Converte a coluna 'date' para datetime para ordenação correta
                 try:
-                    pending_bets['date_parsed'] = pd.to_datetime(pending_bets['date'], format='%d %b %Y %H:%M')
+                    pending_bets["date_parsed"] = pd.to_datetime(
+                        pending_bets["date"], format="%d %b %Y %H:%M"
+                    )
                 except:
                     # Fallback para outros formatos de data possíveis
-                    pending_bets['date_parsed'] = pd.to_datetime(pending_bets['date'], errors='coerce')
-                
+                    pending_bets["date_parsed"] = pd.to_datetime(
+                        pending_bets["date"], errors="coerce"
+                    )
+
                 # Ordena por data (mais próxima primeiro)
-                pending_bets = pending_bets.sort_values('date_parsed', ascending=True)
-                
+                pending_bets = pending_bets.sort_values("date_parsed", ascending=True)
+
                 # Remove a coluna auxiliar de data parseada
-                pending_bets = pending_bets.drop('date_parsed', axis=1)
-                
+                pending_bets = pending_bets.drop("date_parsed", axis=1)
+
                 st.write(
                     f"📊 **{len(pending_bets)} apostas pendentes** (ordenadas por data mais próxima)"
                 )
@@ -1387,7 +1649,7 @@ def main():
                     col
                     for col in [
                         "date",
-                        "league", 
+                        "league",
                         "t1",
                         "t2",
                         "bet_type",
@@ -1401,19 +1663,21 @@ def main():
 
                 # Mostra tabela de apostas pendentes
                 st.dataframe(
-                    pending_bets[display_cols], 
-                    use_container_width=True, 
+                    pending_bets[display_cols],
+                    use_container_width=True,
                     height=400,
-                    hide_index=True
+                    hide_index=True,
                 )
             else:
                 st.info(
                     "📭 Nenhuma aposta pendente encontrada no arquivo bets/bets.csv"
                 )
-            
+
         except Exception as e:
             st.error(f"Erro ao carregar apostas pendentes: {e}")
-            st.error("Verifique se o arquivo bets/bets.csv existe e contém a coluna 'status'")
+            st.error(
+                "Verifique se o arquivo bets/bets.csv existe e contém a coluna 'status'"
+            )
 
         # Dados Detalhados
         st.markdown("---")
@@ -1458,7 +1722,7 @@ def main():
             st.error(f"Erro ao mostrar dados detalhados: {e}")
 
         st.markdown("---")
-        st.subheader("🎯 Odds Analysis")
+        st.subheader("🎯 Profitability Analysis by Odds Range")
         try:
             odds_plot(processed_df)
         except Exception as e:
@@ -1485,7 +1749,6 @@ def main():
         except Exception as e:
             st.error(f"Erro no gráfico de mapas: {e}")
 
-        
     except Exception as e:
         st.error(f"An unexpected error occurred: {e}")
 
