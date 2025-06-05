@@ -396,6 +396,9 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 31 Mai 2025 12:00,LEC,Fnatic,GiantX,under,game_duration 33.5,28.48,22.11%,1.5,1.83,BET365,url não disponível,win,,0.83,2
 31 Mai 2025 12:00,LEC,Fnatic,GiantX,under,game_duration 33.5,33.1,22.11%,1.5,1.83,BET365,url não disponível,win,,0.83,3
 31 Mai 2025 12:00,LEC,Fnatic,GiantX,under,game_duration 33.5,33.63,22.11%,1.5,1.83,BET365,url não disponível,loss,,-1.0,4
+4 Jun 2025 10:00,LJL,QT DIG∞,Burning Core Toyama,under,total_kills 34.5,31.0,27.89%,1.43,1.83,BET365,url não disponível,win,,0.83,1
+4 Jun 2025 10:00,VCS,Mila Gaming,GenZ Gaming,over,total_kills 35.5,46.0,23.53%,1.48,1.83,BET365,url não disponível,win,,0.83,1
+4 Jun 2025 10:00,VCS,Mila Gaming,GenZ Gaming,over,total_kills 35.5,52.0,23.53%,1.48,1.83,BET365,url não disponível,win,,0.83,2
 30 Mai 2025 09:00,LCP,GAM Esports,MGN Vikings Esports,under,game_duration 32.5,44.35,18.41%,1.55,1.83,BET365,url não disponível,loss,,-1.0,1
 30 Mai 2025 09:00,LCP,GAM Esports,MGN Vikings Esports,under,game_duration 32.5,45.07,18.41%,1.55,1.83,BET365,url não disponível,loss,,-1.0,2
 30 Mai 2025 09:00,LCP,GAM Esports,MGN Vikings Esports,under,game_duration 32.5,40.0,18.41%,1.55,1.83,BET365,url não disponível,loss,,-1.0,3
@@ -445,3 +448,24 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 3 Jun 2025 06:00,LPL,Anyone's Legend,Weibo Gaming,over,total_barons 1.5,2.0,12.50%,3.33,3.75,BET365,url não disponível,win,,2.75,2
 3 Jun 2025 06:00,LPL,Anyone's Legend,Weibo Gaming,over,total_barons 1.5,0.0,12.50%,3.33,3.75,BET365,url não disponível,loss,,-1.0,3
 3 Jun 2025 06:00,LPL,Anyone's Legend,Weibo Gaming,over,total_barons 1.5,1.0,12.50%,3.33,3.75,BET365,url não disponível,loss,,-1.0,4
+4 Jun 2025 05:00,LCK,Dplus KIA,KT Rolster,under,total_towers 12.5,13.0,14.75%,1.33,1.53,BET365,url não disponível,loss,,-1.0,1
+4 Jun 2025 05:00,LCK,Dplus KIA,KT Rolster,under,total_towers 12.5,10.0,14.75%,1.33,1.53,BET365,url não disponível,win,,0.53,2
+4 Jun 2025 05:00,LCK,Dplus KIA,KT Rolster,under,total_towers 12.5,14.0,14.75%,1.33,1.53,BET365,url não disponível,loss,,-1.0,3
+4 Jun 2025 05:00,LCK,Dplus KIA,KT Rolster,under,game_duration 32.5,37.2,32.67%,1.38,1.83,BET365,url não disponível,loss,,-1.0,1
+4 Jun 2025 05:00,LCK,Dplus KIA,KT Rolster,under,game_duration 32.5,35.43,32.67%,1.38,1.83,BET365,url não disponível,loss,,-1.0,2
+4 Jun 2025 05:00,LCK,Dplus KIA,KT Rolster,under,game_duration 32.5,35.5,32.67%,1.38,1.83,BET365,url não disponível,loss,,-1.0,3
+4 Jun 2025 06:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_kills 32.5,31.0,37.25%,1.33,1.83,BET365,url não disponível,win,,0.83,1
+4 Jun 2025 06:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_kills 32.5,42.0,37.25%,1.33,1.83,BET365,url não disponível,loss,,-1.0,2
+4 Jun 2025 06:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_kills 32.5,28.0,37.25%,1.33,1.83,BET365,url não disponível,win,,0.83,3
+4 Jun 2025 06:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_kills 32.5,36.0,37.25%,1.33,1.83,BET365,url não disponível,loss,,-1.0,4
+4 Jun 2025 06:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_kills 32.5,27.0,37.25%,1.33,1.83,BET365,url não disponível,win,,0.83,5
+5 Jun 2025 06:00,LPL,Team WE,JD Gaming,under,total_dragons 4.5,4.0,12.50%,1.6,1.8,BET365,url não disponível,win,,0.8,1
+5 Jun 2025 06:00,LPL,Team WE,JD Gaming,under,total_dragons 4.5,3.0,12.50%,1.6,1.8,BET365,url não disponível,win,,0.8,2
+5 Jun 2025 06:00,LPL,Team WE,JD Gaming,under,total_dragons 4.5,5.0,12.50%,1.6,1.8,BET365,url não disponível,loss,,-1.0,3
+5 Jun 2025 06:00,LPL,Team WE,JD Gaming,under,total_dragons 4.5,4.0,12.50%,1.6,1.8,BET365,url não disponível,win,,0.8,4
+4 Jun 2025 07:00,VCS,SN CyberCore Esports,Saigon Secret,under,total_kills 35.5,28.0,20.26%,1.52,1.83,BET365,url não disponível,win,,0.83,1
+4 Jun 2025 07:00,VCS,SN CyberCore Esports,Saigon Secret,under,total_kills 35.5,24.0,20.26%,1.52,1.83,BET365,url não disponível,win,,0.83,2
+4 Jun 2025 07:00,VCS,SN CyberCore Esports,Saigon Secret,under,total_kills 35.5,45.0,20.26%,1.52,1.83,BET365,url não disponível,loss,,-1.0,3
+4 Jun 2025 07:00,VCS,SN CyberCore Esports,Saigon Secret,under,total_inhibitors 1.5,2.0,19.16%,1.39,1.66,BET365,url não disponível,loss,,-1.0,1
+4 Jun 2025 07:00,VCS,SN CyberCore Esports,Saigon Secret,under,total_inhibitors 1.5,1.0,19.16%,1.39,1.66,BET365,url não disponível,win,,0.66,2
+4 Jun 2025 07:00,VCS,SN CyberCore Esports,Saigon Secret,under,total_inhibitors 1.5,1.0,19.16%,1.39,1.66,BET365,url não disponível,win,,0.66,3
