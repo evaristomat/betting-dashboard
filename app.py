@@ -1632,7 +1632,7 @@ def main():
 
         all_leagues = sorted(df["league"].unique().tolist())
 
-        # Debug: mostra classificação das ligas
+        # Identifica quais ligas estão disponíveis
         tier1_available = [league for league in all_leagues if league in tier1_leagues]
         tier2_available = [
             league
@@ -1640,12 +1640,12 @@ def main():
             if league in tier2_leagues or league not in tier1_leagues
         ]
 
-        st.sidebar.markdown("### 🔍 Debug - Classificação de Ligas")
-        st.sidebar.markdown(
-            f"**🏆 TIER 1 ({len(tier1_available)}):** {', '.join(tier1_available) if tier1_available else 'Nenhuma'}"
+        # Debug no console
+        print(
+            f"DEBUG - TIER 1 ({len(tier1_available)}): {', '.join(tier1_available) if tier1_available else 'Nenhuma'}"
         )
-        st.sidebar.markdown(
-            f"**🥈 TIER 2 ({len(tier2_available)}):** {', '.join(tier2_available) if tier2_available else 'Nenhuma'}"
+        print(
+            f"DEBUG - TIER 2 ({len(tier2_available)}): {', '.join(tier2_available) if tier2_available else 'Nenhuma'}"
         )
 
         # Seletor de liga
