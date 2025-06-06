@@ -1602,14 +1602,14 @@ def main():
         st.markdown(
             """
         <div style="text-align: center; margin-bottom: 30px;">
-            <h1 style="font-size: 3.5em; font-weight: bold; margin: 0; color: #FFD700;">
+            <h1 style="font-size: 3.15em; font-weight: bold; margin: 0; color: #FFD700;">
                 🏆 BETANALYTICS PRO
             </h1>
             <div style="font-size: 1.5em; color: #888; margin: 10px 0; letter-spacing: 2px;">
                 ━━━━━━━━━━━━━━━━━━━━━━━
             </div>
             <h3 style="color: #ccc; margin: 0; font-weight: 300;">
-                V1.0 • Created by Evaristo
+                V1.0 • Created by <a href="https://x.com/seu_usuario" target="_blank" style="color: #1DA1F2; text-decoration: none;">Evaristo</a>
             </h3>
         </div>
         """,
