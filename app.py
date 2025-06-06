@@ -1609,7 +1609,7 @@ def main():
                 ━━━━━━━━━━━━━━━━━━━━━━━
             </div>
             <h3 style="color: #ccc; margin: 0; font-weight: 300;">
-                V1.0 • Created by <a href="https://x.com/seu_usuario" target="_blank" style="color: #1DA1F2; text-decoration: none;">Evaristo</a>
+                V1.0 • Created by <a href="https://x.com/evaristomat" target="_blank" style="color: #1DA1F2; text-decoration: none;">Evaristo</a>
             </h3>
         </div>
         """,
