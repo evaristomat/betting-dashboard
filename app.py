@@ -1567,7 +1567,7 @@ def main():
             )
             return
 
-        st.title("Betting Statistics Dashboard - Classic Style")
+        st.title("BetAnalytics Pro V1.0 - Painel de Performance Apostas")
 
         # Filtro de Tier (TIER 1 e TIER 2 apenas)
         tier1_leagues = [
