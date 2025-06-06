@@ -31,7 +31,7 @@ plt.rcParams.update(PARAMS)
 
 # ----------------- DATA LOADING & PROCESSING FUNCTIONS ----------------- #
 def ensure_datetime(df, date_column="date"):
-    """Converte coluna de data para datetime tratando meses em português"""
+    """Converte coluna de data para datetime tratando diferentes formatos"""
     if not np.issubdtype(df[date_column].dtype, np.datetime64):
         # Mapeamento de meses português -> inglês
         month_mapping = {
@@ -49,30 +49,65 @@ def ensure_datetime(df, date_column="date"):
             "Dez": "Dec",
         }
 
-        # Converte meses portugueses para inglês
+        # Cria uma cópia para não modificar o original
         df_temp = df.copy()
         date_str = df_temp[date_column].astype(str)
 
-        for pt_month, en_month in month_mapping.items():
-            date_str = date_str.str.replace(pt_month, en_month)
+        # Debug: mostra algumas datas antes da conversão
+        print(
+            f"DEBUG - Primeiras 3 datas antes da conversão: {date_str.head(3).tolist()}"
+        )
 
-        # Tenta diferentes formatos após conversão
+        # Converte meses portugueses para inglês
+        for pt_month, en_month in month_mapping.items():
+            date_str = date_str.str.replace(pt_month, en_month, regex=False)
+
+        # Tenta diferentes formatos de conversão
+        converted_dates = None
+
         try:
-            # Formato: "22 May 2025 13:00"
-            df[date_column] = pd.to_datetime(
+            # Formato: "4 Jun 2025 07:00"
+            converted_dates = pd.to_datetime(
                 date_str, format="%d %b %Y %H:%M", errors="coerce"
             )
+            print(
+                f"DEBUG - Conversão formato 1 funcionou para {converted_dates.notna().sum()} datas"
+            )
         except:
+            pass
+
+        if converted_dates is None or converted_dates.isna().all():
             try:
                 # Formato mais flexível
-                df[date_column] = pd.to_datetime(
+                converted_dates = pd.to_datetime(
                     date_str, dayfirst=True, errors="coerce"
                 )
+                print(
+                    f"DEBUG - Conversão formato 2 funcionou para {converted_dates.notna().sum()} datas"
+                )
             except:
+                pass
+
+        if converted_dates is None or converted_dates.isna().all():
+            try:
                 # Fallback final
-                df[date_column] = pd.to_datetime(
+                converted_dates = pd.to_datetime(
                     date_str, infer_datetime_format=True, errors="coerce"
                 )
+                print(
+                    f"DEBUG - Conversão formato 3 funcionou para {converted_dates.notna().sum()} datas"
+                )
+            except:
+                pass
+
+        # Atribui as datas convertidas
+        if converted_dates is not None:
+            df[date_column] = converted_dates
+            # Debug: mostra algumas datas depois da conversão
+            valid_dates = df[df[date_column].notna()][date_column].head(3)
+            print(f"DEBUG - Primeiras 3 datas após conversão: {valid_dates.tolist()}")
+        else:
+            print("DEBUG - ERRO: Nenhuma conversão de data funcionou!")
 
     return df
 
@@ -81,24 +116,64 @@ def ensure_datetime(df, date_column="date"):
 def load_pending_bets():
     """Carrega apostas pendentes do arquivo bets.csv"""
     try:
-        df_pending = pd.read_csv("bets/bets_atualizadas.csv")
-        print(df_pending)
+        # Tenta carregar diferentes arquivos possíveis
+        possible_files = [
+            "bets/bets_atualizadas.csv",
+            "bets/bets.csv",
+            "bets_atualizadas.csv",
+            "bets.csv",
+        ]
+
+        df_pending = None
+        file_used = None
+
+        for file_path in possible_files:
+            try:
+                df_pending = pd.read_csv(file_path)
+                file_used = file_path
+                print(f"DEBUG - Arquivo carregado: {file_path}")
+                break
+            except FileNotFoundError:
+                continue
+
+        if df_pending is None:
+            print("DEBUG - Nenhum arquivo de apostas encontrado")
+            return pd.DataFrame()
+
+        print(f"DEBUG - Total de linhas carregadas: {len(df_pending)}")
+        print(f"DEBUG - Colunas disponíveis: {df_pending.columns.tolist()}")
+
+        # Verifica se existe coluna status
+        if "status" not in df_pending.columns:
+            print(
+                "DEBUG - Coluna 'status' não encontrada, assumindo todas como 'pending'"
+            )
+            df_pending["status"] = "pending"
 
         # Filtra apenas apostas pendentes
         pending_bets = df_pending[df_pending["status"] == "pending"].copy()
+        print(f"DEBUG - Apostas com status 'pending': {len(pending_bets)}")
 
         if len(pending_bets) > 0:
-            # Converte data para datetime para ordenação
+            # Converte data para datetime
             pending_bets = ensure_datetime(pending_bets, "date")
 
+            # Remove linhas com datas inválidas
+            valid_dates = pending_bets["date"].notna().sum()
+            print(f"DEBUG - Apostas com datas válidas: {valid_dates}")
+
+            pending_bets = pending_bets[pending_bets["date"].notna()]
+
             # Ordena por data (mais próxima primeiro)
-            pending_bets = pending_bets.sort_values("date")
+            if len(pending_bets) > 0:
+                pending_bets = pending_bets.sort_values("date")
+                print(f"DEBUG - Primeira data: {pending_bets['date'].min()}")
+                print(f"DEBUG - Última data: {pending_bets['date'].max()}")
 
         return pending_bets
 
-    except FileNotFoundError:
-        return pd.DataFrame()  # Retorna DataFrame vazio se arquivo não existir
     except Exception as e:
+        print(f"DEBUG - Erro ao carregar apostas pendentes: {e}")
         st.error(f"Erro ao carregar apostas pendentes: {e}")
         return pd.DataFrame()
 
@@ -909,20 +984,37 @@ def get_melhores_apostas():
     """
     try:
         df_pending = load_pending_bets()
+        print(f"DEBUG get_melhores_apostas - Apostas carregadas: {len(df_pending)}")
 
         if len(df_pending) == 0:
             return pd.DataFrame()
 
-        # Converte data para datetime
+        # Converte data para datetime (já foi feito no load_pending_bets, mas garante)
         df_pending = ensure_datetime(df_pending, "date")
 
-        # Filtra apenas apostas do dia atual
-        hoje = date.today()
-        df_hoje = df_pending[df_pending["date"].dt.date == hoje].copy()
+        # Remove apostas com datas inválidas
+        df_hoje = df_pending[df_pending["date"].notna()].copy()
+        print(f"DEBUG get_melhores_apostas - Apostas com datas válidas: {len(df_hoje)}")
 
         if len(df_hoje) == 0:
             return pd.DataFrame()
 
+        # Filtra apenas apostas do dia atual
+        hoje = pd.Timestamp.now().date()
+        print(f"DEBUG get_melhores_apostas - Data de hoje: {hoje}")
+
+        # Converte coluna de data para date para comparação
+        df_hoje["date_only"] = df_hoje["date"].dt.date
+
+        # Filtra por hoje
+        df_hoje = df_hoje[df_hoje["date_only"] == hoje].copy()
+        print(f"DEBUG get_melhores_apostas - Apostas de hoje: {len(df_hoje)}")
+
+        if len(df_hoje) == 0:
+            print("DEBUG get_melhores_apostas - Nenhuma aposta encontrada para hoje")
+            return pd.DataFrame()
+
+        # Processa dados
         df_hoje["ROI_num"] = (
             df_hoje["ROI"].astype(str).str.replace("%", "").astype(float)
         )
@@ -933,6 +1025,10 @@ def get_melhores_apostas():
         )
         df_hoje["score"] = df_hoje["ROI_num"]
 
+        print(
+            f"DEBUG get_melhores_apostas - Apostas após processamento: {len(df_hoje)}"
+        )
+
         melhores = (
             df_hoje.groupby("jogo_id")
             .apply(lambda x: x.nlargest(min(2, len(x)), "score"))
@@ -942,9 +1038,13 @@ def get_melhores_apostas():
         if len(melhores) > 10:
             melhores = melhores.nlargest(10, "score")
 
+        print(
+            f"DEBUG get_melhores_apostas - Melhores apostas retornadas: {len(melhores)}"
+        )
         return melhores
 
     except Exception as e:
+        print(f"DEBUG get_melhores_apostas - Erro: {e}")
         st.error(f"Erro ao carregar apostas do dia: {e}")
         return pd.DataFrame()
 
@@ -955,20 +1055,37 @@ def get_apostas_amanha():
     """
     try:
         df_pending = load_pending_bets()
+        print(f"DEBUG get_apostas_amanha - Apostas carregadas: {len(df_pending)}")
 
         if len(df_pending) == 0:
             return pd.DataFrame()
 
-        # Converte data para datetime
+        # Converte data para datetime (já foi feito no load_pending_bets, mas garante)
         df_pending = ensure_datetime(df_pending, "date")
 
-        # Filtra apenas apostas de amanhã
-        amanha = date.today() + timedelta(days=1)
-        df_amanha = df_pending[df_pending["date"].dt.date == amanha].copy()
+        # Remove apostas com datas inválidas
+        df_amanha = df_pending[df_pending["date"].notna()].copy()
+        print(f"DEBUG get_apostas_amanha - Apostas com datas válidas: {len(df_amanha)}")
 
         if len(df_amanha) == 0:
             return pd.DataFrame()
 
+        # Filtra apenas apostas de amanhã
+        amanha = pd.Timestamp.now().date() + timedelta(days=1)
+        print(f"DEBUG get_apostas_amanha - Data de amanhã: {amanha}")
+
+        # Converte coluna de data para date para comparação
+        df_amanha["date_only"] = df_amanha["date"].dt.date
+
+        # Filtra por amanhã
+        df_amanha = df_amanha[df_amanha["date_only"] == amanha].copy()
+        print(f"DEBUG get_apostas_amanha - Apostas de amanhã: {len(df_amanha)}")
+
+        if len(df_amanha) == 0:
+            print("DEBUG get_apostas_amanha - Nenhuma aposta encontrada para amanhã")
+            return pd.DataFrame()
+
+        # Processa dados
         df_amanha["ROI_num"] = (
             df_amanha["ROI"].astype(str).str.replace("%", "").astype(float)
         )
@@ -979,6 +1096,10 @@ def get_apostas_amanha():
         )
         df_amanha["score"] = df_amanha["ROI_num"]
 
+        print(
+            f"DEBUG get_apostas_amanha - Apostas após processamento: {len(df_amanha)}"
+        )
+
         melhores = (
             df_amanha.groupby("jogo_id")
             .apply(lambda x: x.nlargest(min(2, len(x)), "score"))
@@ -988,9 +1109,13 @@ def get_apostas_amanha():
         if len(melhores) > 10:
             melhores = melhores.nlargest(10, "score")
 
+        print(
+            f"DEBUG get_apostas_amanha - Melhores apostas retornadas: {len(melhores)}"
+        )
         return melhores
 
     except Exception as e:
+        print(f"DEBUG get_apostas_amanha - Erro: {e}")
         st.error(f"Erro ao carregar apostas de amanhã: {e}")
         return pd.DataFrame()
 
@@ -1615,30 +1740,14 @@ def main():
 
         try:
             # Carrega todas as apostas
-            all_bets = (
-                load_pending_bets()
-            )  # Assumindo que esta função carrega o CSV completo
+            all_bets = load_pending_bets()
 
             # Filtra apenas apostas com status 'pending'
             pending_bets = all_bets[all_bets["status"] == "pending"].copy()
 
             if len(pending_bets) > 0:
-                # Converte a coluna 'date' para datetime para ordenação correta
-                try:
-                    pending_bets["date_parsed"] = pd.to_datetime(
-                        pending_bets["date"], format="%d %b %Y %H:%M"
-                    )
-                except:
-                    # Fallback para outros formatos de data possíveis
-                    pending_bets["date_parsed"] = pd.to_datetime(
-                        pending_bets["date"], errors="coerce"
-                    )
-
                 # Ordena por data (mais próxima primeiro)
-                pending_bets = pending_bets.sort_values("date_parsed", ascending=True)
-
-                # Remove a coluna auxiliar de data parseada
-                pending_bets = pending_bets.drop("date_parsed", axis=1)
+                pending_bets = pending_bets.sort_values("date", ascending=True)
 
                 st.write(
                     f"📊 **{len(pending_bets)} apostas pendentes** (ordenadas por data mais próxima)"
@@ -1669,15 +1778,10 @@ def main():
                     hide_index=True,
                 )
             else:
-                st.info(
-                    "📭 Nenhuma aposta pendente encontrada no arquivo bets/bets.csv"
-                )
+                st.info("📭 Nenhuma aposta pendente encontrada")
 
         except Exception as e:
             st.error(f"Erro ao carregar apostas pendentes: {e}")
-            st.error(
-                "Verifique se o arquivo bets/bets.csv existe e contém a coluna 'status'"
-            )
 
         # Dados Detalhados
         st.markdown("---")
