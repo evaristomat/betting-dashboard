@@ -280,13 +280,13 @@ def display_summary(df, roi_value):
 
         # Display em colunas
         col1, col2, col3, col4, col5, col6, col7 = st.columns([1, 1, 1, 1, 1, 1, 1.5])
-        col1.metric(label="ROI Chosen", value=f"{roi_value}%")
-        col2.metric(label="Total Bets", value=f"{total_bets}")
-        col3.metric(label="Wins", value=f"{wins}")
-        col4.metric(label="Losses", value=f"{losses}")
-        col5.metric(label="Win Rate", value=f"{win_rate * 100:.0f}%")
-        col6.metric(label="Average Odd", value=f"{avg_odd:.2f}")
-        col7.metric(label="Profit", value=f"{total_profit:.2f}U")
+        col1.metric(label="ROI Escolhido", value=f"{roi_value}%")
+        col2.metric(label="Total Apostas", value=f"{total_bets}")
+        col3.metric(label="Vitórias", value=f"{wins}")
+        col4.metric(label="Derrotas", value=f"{losses}")
+        col5.metric(label="Taxa Vitória", value=f"{win_rate * 100:.0f}%")
+        col6.metric(label="Odd Média", value=f"{avg_odd:.2f}")
+        col7.metric(label="Lucro", value=f"{total_profit:.2f}U")
 
     except Exception as e:
         st.error(f"Erro no cálculo do resumo: {e}")
@@ -295,7 +295,7 @@ def display_summary(df, roi_value):
 def bankroll_plot(df):
     """Gráfico de evolução do bankroll geral e por games"""
     if len(df) == 0:
-        st.warning("No data available for bankroll plot.")
+        st.warning("Nenhum dado disponível para gráfico de bankroll.")
         return
 
     try:
@@ -323,7 +323,7 @@ def bankroll_plot(df):
         categories = {}
 
         # Todos os games
-        categories["All Games"] = df_finished.copy()
+        categories["Todos os Games"] = df_finished.copy()
 
         # Games específicos
         game_values = df_finished["game"].dropna().unique()
@@ -345,7 +345,7 @@ def bankroll_plot(df):
 
         # ========== GRÁFICO: Evolução do Bankroll ==========
         plt.title(
-            "Evolution of Bankroll by Game Category",
+            "Evolução do Bankroll por Categoria de Game",
             fontsize=16,
             fontweight="bold",
             color="white",
@@ -387,19 +387,19 @@ def bankroll_plot(df):
 
             stats_data.append(
                 {
-                    "Category": category,
-                    "Total Bets": total_bets,
-                    "Wins": wins,
-                    "Losses": losses,
-                    "Win Rate (%)": winrate,
-                    "Total Profit": total_profit,
-                    "Avg ROI (%)": avg_roi,
+                    "Categoria": category,
+                    "Total Apostas": total_bets,
+                    "Vitórias": wins,
+                    "Derrotas": losses,
+                    "Taxa Vitória (%)": winrate,
+                    "Lucro Total": total_profit,
+                    "ROI Médio (%)": avg_roi,
                 }
             )
 
         plt.axhline(y=0, color="gray", linestyle="-", alpha=0.3)
-        plt.ylabel("Cumulative Profit (units)", fontsize=12, color="white")
-        plt.xlabel("Bet Sequence", fontsize=12, color="white")
+        plt.ylabel("Lucro Cumulativo (unidades)", fontsize=12, color="white")
+        plt.xlabel("Sequência de Apostas", fontsize=12, color="white")
         plt.legend(loc="best")  # Legenda dentro do gráfico
         plt.grid(True, alpha=0.3)
 
@@ -426,15 +426,17 @@ def plot_simple_bankroll_evolution(df):
             x=df.index,
             y="cumulative_profit",
             marker="o",
-            label="Cumulative Profit",
+            label="Lucro Cumulativo",
         )
 
         # Linha de referência zero
         plt.axhline(y=0, color="gray", linestyle="-", alpha=0.3)
 
-        plt.title("Evolution of Bankroll Over Bets", fontsize=16, fontweight="bold")
-        plt.ylabel("Cumulative Profit (units)", fontsize=12)
-        plt.xlabel("Bet Sequence", fontsize=12)
+        plt.title(
+            "Evolução do Bankroll ao Longo das Apostas", fontsize=16, fontweight="bold"
+        )
+        plt.ylabel("Lucro Cumulativo (unidades)", fontsize=12)
+        plt.xlabel("Sequência de Apostas", fontsize=12)
         plt.legend(loc="best")  # Legenda dentro do gráfico
         plt.grid(True, alpha=0.3)
         plt.tight_layout()
@@ -444,16 +446,96 @@ def plot_simple_bankroll_evolution(df):
         st.error(f"Erro no plot simples de bankroll: {e}")
 
 
+def league_profit_plot(df):
+    """Gráfico de lucro por liga"""
+    if len(df) == 0:
+        st.warning("Nenhum dado disponível para análise por liga.")
+        return
+
+    try:
+        # Calcula estatísticas por liga
+        league_stats = (
+            df.groupby("league")
+            .agg({"profit": ["sum", "count"], "status": lambda x: (x == "win").mean()})
+            .round(2)
+        )
+        league_stats.columns = ["Lucro_Total", "Total_Apostas", "Taxa_Vitoria"]
+
+        # Filtra ligas com pelo menos 3 apostas
+        league_stats = league_stats[league_stats["Total_Apostas"] >= 3]
+
+        if len(league_stats) == 0:
+            st.warning("Nenhuma liga com dados suficientes (mínimo 3 apostas).")
+            return
+
+        # Ordena por lucro
+        league_stats = league_stats.sort_values("Lucro_Total", ascending=True)
+
+        plt.figure(figsize=(12, 8))
+
+        # Cores baseadas no lucro
+        colors = ["red" if x < 0 else "green" for x in league_stats["Lucro_Total"]]
+
+        # Gráfico horizontal para melhor visualização dos nomes
+        bars = plt.barh(
+            range(len(league_stats)),
+            league_stats["Lucro_Total"],
+            color=colors,
+            alpha=0.7,
+        )
+
+        plt.title("Lucro Total por Liga", fontsize=16, fontweight="bold")
+        plt.xlabel("Lucro Total (U)")
+        plt.ylabel("Liga")
+        plt.yticks(range(len(league_stats)), league_stats.index)
+        plt.grid(True, alpha=0.3, axis="x")
+        plt.axvline(0, color="black", linestyle="--", alpha=0.5)
+
+        # Anota valores nas barras
+        for i, bar in enumerate(bars):
+            width = bar.get_width()
+            plt.text(
+                width,
+                bar.get_y() + bar.get_height() / 2,
+                f"{width:.1f}U",
+                ha="left" if width >= 0 else "right",
+                va="center",
+                fontweight="bold",
+            )
+
+        plt.tight_layout()
+        st.pyplot(plt.gcf())
+
+        # Tabela complementar
+        st.markdown("### 📊 Estatísticas Detalhadas por Liga")
+        display_league_stats = league_stats.copy()
+        display_league_stats["Taxa_Vitoria"] = display_league_stats[
+            "Taxa_Vitoria"
+        ].apply(lambda x: f"{x:.1%}")
+        display_league_stats["Lucro_Total"] = display_league_stats["Lucro_Total"].apply(
+            lambda x: f"{x:.2f}U"
+        )
+        display_league_stats.columns = ["Lucro Total", "Total Apostas", "Taxa Vitória"]
+
+        st.dataframe(
+            display_league_stats.sort_values("Total Apostas", ascending=False),
+            use_container_width=True,
+        )
+
+    except Exception as e:
+        st.error(f"Erro ao criar gráfico de lucro por liga: {e}")
+
+
 def odds_plot(df: pd.DataFrame) -> None:
     """Gráfico de lucratividade por faixas de odds específicas."""
     if len(df) == 0 or df["odds"].isna().all():
-        st.warning("No odds data available for analysis.")
+        st.warning("Nenhum dado de odds disponível para análise.")
         return
 
-    # Definir as faixas de odds - Opção 5: Simples e Clara
+    # Definir as faixas de odds
     def categorize_odds(odd_value):
         if pd.isna(odd_value):
-            return "Unknown"
+            return "Desconhecido"
         elif odd_value < 1.5:
             return "< 1.5"
         elif 1.5 <= odd_value < 2.0:
@@ -469,11 +551,11 @@ def odds_plot(df: pd.DataFrame) -> None:
     df = df.copy()
     df["odds_category"] = df["odds"].apply(categorize_odds)
 
-    # Remover categoria "Unknown" se existir
-    df = df[df["odds_category"] != "Unknown"]
+    # Remover categoria "Desconhecido" se existir
+    df = df[df["odds_category"] != "Desconhecido"]
 
     if len(df) == 0:
-        st.warning("No valid odds data after categorization.")
+        st.warning("Nenhum dado válido de odds após categorização.")
         return
 
     # Calcular estatísticas por categoria
@@ -481,8 +563,7 @@ def odds_plot(df: pd.DataFrame) -> None:
         df.groupby("odds_category")
         .agg(
             {
-                "profit": ["sum", "count", "mean"],
-                "status": lambda x: (x == "win").mean(),
+                "profit": ["sum", "count"],
                 "odds": "mean",
             }
         )
@@ -491,11 +572,9 @@ def odds_plot(df: pd.DataFrame) -> None:
 
     # Flatten column names
     odds_stats.columns = [
-        "Total_Profit",
-        "Total_Bets",
-        "Avg_Profit_Per_Bet",
-        "Win_Rate",
-        "Avg_Odds",
+        "Lucro_Total",
+        "Total_Apostas",
+        "Odds_Media",
     ]
 
     # Ordenar categorias de forma lógica
@@ -509,20 +588,22 @@ def odds_plot(df: pd.DataFrame) -> None:
     odds_stats = odds_stats.dropna()
 
     if len(odds_stats) == 0:
-        st.warning("No valid data for odds profitability analysis.")
+        st.warning("Nenhum dado válido para análise de lucratividade por odds.")
         return
 
-    # Criar figura com subplots
-    fig, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(15, 12))
-    fig.suptitle("Profitability Analysis by Odds Range", fontsize=16, fontweight="bold")
-
-    # 1. Total Profit por categoria
-    colors = ["green" if x >= 0 else "red" for x in odds_stats["Total_Profit"]]
-    bars1 = ax1.bar(
-        range(len(odds_stats)), odds_stats["Total_Profit"], color=colors, alpha=0.7
+    # Criar figura com 2 subplots em vez de 4
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
+    fig.suptitle(
+        "Análise de Lucratividade por Faixa de Odds", fontsize=16, fontweight="bold"
     )
-    ax1.set_title("Total Profit by Odds Range")
-    ax1.set_ylabel("Total Profit (U)")
+
+    # 1. Lucro Total por categoria
+    colors = ["green" if x >= 0 else "red" for x in odds_stats["Lucro_Total"]]
+    bars1 = ax1.bar(
+        range(len(odds_stats)), odds_stats["Lucro_Total"], color=colors, alpha=0.7
+    )
+    ax1.set_title("Lucro Total por Faixa de Odds")
+    ax1.set_ylabel("Lucro Total (U)")
     ax1.set_xticks(range(len(odds_stats)))
     ax1.set_xticklabels(odds_stats.index, rotation=45)
     ax1.grid(True, alpha=0.3)
@@ -539,68 +620,20 @@ def odds_plot(df: pd.DataFrame) -> None:
             va="bottom" if height >= 0 else "top",
         )
 
-    # 2. Win Rate por categoria
+    # 2. Número de apostas por categoria
     bars2 = ax2.bar(
-        range(len(odds_stats)), odds_stats["Win_Rate"], color="skyblue", alpha=0.7
+        range(len(odds_stats)), odds_stats["Total_Apostas"], color="orange", alpha=0.7
     )
-    ax2.set_title("Win Rate by Odds Range")
-    ax2.set_ylabel("Win Rate")
+    ax2.set_title("Número de Apostas por Faixa de Odds")
+    ax2.set_ylabel("Número de Apostas")
     ax2.set_xticks(range(len(odds_stats)))
     ax2.set_xticklabels(odds_stats.index, rotation=45)
     ax2.grid(True, alpha=0.3)
-    ax2.set_ylim(0, 1)
 
-    # Anotar percentuais
+    # Anotar valores
     for i, bar in enumerate(bars2):
         height = bar.get_height()
         ax2.text(
-            bar.get_x() + bar.get_width() / 2.0,
-            height,
-            f"{height:.1%}",
-            ha="center",
-            va="bottom",
-        )
-
-    # 3. Lucro médio por aposta
-    colors3 = ["green" if x >= 0 else "red" for x in odds_stats["Avg_Profit_Per_Bet"]]
-    bars3 = ax3.bar(
-        range(len(odds_stats)),
-        odds_stats["Avg_Profit_Per_Bet"],
-        color=colors3,
-        alpha=0.7,
-    )
-    ax3.set_title("Average Profit per Bet")
-    ax3.set_ylabel("Avg Profit per Bet (U)")
-    ax3.set_xticks(range(len(odds_stats)))
-    ax3.set_xticklabels(odds_stats.index, rotation=45)
-    ax3.grid(True, alpha=0.3)
-    ax3.axhline(0, color="black", linestyle="--", alpha=0.5)
-
-    # Anotar valores
-    for i, bar in enumerate(bars3):
-        height = bar.get_height()
-        ax3.text(
-            bar.get_x() + bar.get_width() / 2.0,
-            height,
-            f"{height:.3f}U",
-            ha="center",
-            va="bottom" if height >= 0 else "top",
-        )
-
-    # 4. Número de apostas por categoria
-    bars4 = ax4.bar(
-        range(len(odds_stats)), odds_stats["Total_Bets"], color="orange", alpha=0.7
-    )
-    ax4.set_title("Number of Bets by Odds Range")
-    ax4.set_ylabel("Number of Bets")
-    ax4.set_xticks(range(len(odds_stats)))
-    ax4.set_xticklabels(odds_stats.index, rotation=45)
-    ax4.grid(True, alpha=0.3)
-
-    # Anotar valores
-    for i, bar in enumerate(bars4):
-        height = bar.get_height()
-        ax4.text(
             bar.get_x() + bar.get_width() / 2.0,
             height,
             f"{int(height)}",
@@ -612,26 +645,22 @@ def odds_plot(df: pd.DataFrame) -> None:
     st.pyplot(fig)
 
     # Exibir tabela de estatísticas
-    st.markdown("### 📊 Detailed Statistics by Odds Range")
+    st.markdown("### 📊 Estatísticas Detalhadas por Faixa de Odds")
 
     # Preparar tabela para exibição
     display_stats = odds_stats.copy()
-    display_stats["Win_Rate"] = display_stats["Win_Rate"].apply(lambda x: f"{x:.1%}")
-    display_stats["Total_Profit"] = display_stats["Total_Profit"].apply(
+    display_stats["Lucro_Total"] = display_stats["Lucro_Total"].apply(
         lambda x: f"{x:.2f}U"
     )
-    display_stats["Avg_Profit_Per_Bet"] = display_stats["Avg_Profit_Per_Bet"].apply(
-        lambda x: f"{x:.3f}U"
+    display_stats["Odds_Media"] = display_stats["Odds_Media"].apply(
+        lambda x: f"{x:.2f}"
     )
-    display_stats["Avg_Odds"] = display_stats["Avg_Odds"].apply(lambda x: f"{x:.2f}")
-    display_stats["Total_Bets"] = display_stats["Total_Bets"].astype(int)
+    display_stats["Total_Apostas"] = display_stats["Total_Apostas"].astype(int)
 
     display_stats.columns = [
-        "Total Profit",
-        "Total Bets",
-        "Avg Profit/Bet",
-        "Win Rate",
-        "Avg Odds",
+        "Lucro Total",
+        "Total Apostas",
+        "Odds Média",
     ]
 
     st.dataframe(display_stats, use_container_width=True)
@@ -640,7 +669,7 @@ def odds_plot(df: pd.DataFrame) -> None:
 def bet_groups_plot(df):
     """Gráfico de distribuição por grupos de apostas"""
     if len(df) == 0:
-        st.warning("No data available for bet groups plot.")
+        st.warning("Nenhum dado disponível para gráfico de grupos de apostas.")
         return
 
     grouped = df.groupby(["bet_group", "status"]).size().unstack().fillna(0)
@@ -659,7 +688,7 @@ def bet_groups_plot(df):
     grouped = grouped.dropna(subset=["win_ratio", "loss_ratio"])
 
     if len(grouped) == 0:
-        st.warning("No valid data for bet groups analysis.")
+        st.warning("Nenhum dado válido para análise de grupos de apostas.")
         return
 
     plt.figure(figsize=(12, 7))
@@ -704,9 +733,9 @@ def bet_groups_plot(df):
             except (IndexError, KeyError):
                 continue
 
-    plt.title("Distribution of Bet Groups with Wins and Losses")
-    plt.ylabel("Number of Bets")
-    plt.xlabel("Bet Group")
+    plt.title("Distribuição de Grupos de Apostas com Vitórias e Derrotas")
+    plt.ylabel("Número de Apostas")
+    plt.xlabel("Grupo de Apostas")
     plt.xticks(rotation=45)
     plt.legend(title="Status", loc="upper right")
     plt.tight_layout()
@@ -716,7 +745,7 @@ def bet_groups_plot(df):
 def profit_plot(df):
     """Gráfico de lucro por grupo de apostas"""
     if len(df) == 0:
-        st.warning("No data available for profit plot.")
+        st.warning("Nenhum dado disponível para gráfico de lucro.")
         return
 
     plt.figure(figsize=(12, 7))
@@ -750,22 +779,22 @@ def profit_plot(df):
                     fontsize=9,
                 )
 
-        plt.title("Profit by Bet Group and Type")
-        plt.ylabel("Total Profit (U)")
-        plt.xlabel("Bet Group")
+        plt.title("Lucro por Grupo e Tipo de Aposta")
+        plt.ylabel("Lucro Total (U)")
+        plt.xlabel("Grupo de Apostas")
         plt.xticks(rotation=45)
-        plt.legend(title="Bet Type", loc="upper left")
+        plt.legend(title="Tipo de Aposta", loc="upper left")
     else:
         plt.text(
             0.5,
             0.5,
-            "No data available",
+            "Nenhum dado disponível",
             ha="center",
             va="center",
             transform=plt.gca().transAxes,
             fontsize=16,
         )
-        plt.title("Profit by Bet Group and Type")
+        plt.title("Lucro por Grupo e Tipo de Aposta")
 
     plt.tight_layout()
     st.pyplot(ax.get_figure())
@@ -909,7 +938,7 @@ def create_bet_type_analysis_charts(df):
 def map_analysis_plot(df):
     """Gráfico de análise por mapa"""
     if "game" not in df.columns or len(df) == 0:
-        st.warning("No map data available for analysis.")
+        st.warning("Nenhum dado de mapa disponível para análise.")
         return
 
     plt.figure(figsize=(10, 6))
@@ -925,20 +954,20 @@ def map_analysis_plot(df):
     map_stats = map_stats.dropna()
 
     if len(map_stats) == 0:
-        st.warning("No valid map data for analysis.")
+        st.warning("Nenhum dado válido de mapa para análise.")
         return
 
-    map_stats.columns = ["Total Profit", "Win Rate"]
-    map_stats.index = [f"Map {i}" for i in map_stats.index]
+    map_stats.columns = ["Lucro Total", "Taxa Vitória"]
+    map_stats.index = [f"Mapa {i}" for i in map_stats.index]
 
     # Subplot com 2 gráficos
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(15, 6))
 
     # Gráfico de profit por mapa
-    colors = ["green" if x >= 0 else "red" for x in map_stats["Total Profit"]]
-    bars1 = ax1.bar(map_stats.index, map_stats["Total Profit"], color=colors, alpha=0.7)
-    ax1.set_title("Total Profit by Map")
-    ax1.set_ylabel("Total Profit (U)")
+    colors = ["green" if x >= 0 else "red" for x in map_stats["Lucro Total"]]
+    bars1 = ax1.bar(map_stats.index, map_stats["Lucro Total"], color=colors, alpha=0.7)
+    ax1.set_title("Lucro Total por Mapa")
+    ax1.set_ylabel("Lucro Total (U)")
     ax1.tick_params(axis="x", rotation=45)
     ax1.grid(True, alpha=0.3)
 
@@ -955,9 +984,11 @@ def map_analysis_plot(df):
             )
 
     # Gráfico de win rate por mapa
-    bars2 = ax2.bar(map_stats.index, map_stats["Win Rate"], color="skyblue", alpha=0.7)
-    ax2.set_title("Win Rate by Map")
-    ax2.set_ylabel("Win Rate")
+    bars2 = ax2.bar(
+        map_stats.index, map_stats["Taxa Vitória"], color="skyblue", alpha=0.7
+    )
+    ax2.set_title("Taxa de Vitória por Mapa")
+    ax2.set_ylabel("Taxa de Vitória")
     ax2.tick_params(axis="x", rotation=45)
     ax2.grid(True, alpha=0.3)
     ax2.set_ylim(0, 1)
@@ -1252,7 +1283,7 @@ def display_key_insights(df):
         return
 
     st.markdown("---")
-    st.subheader("🔍 Key Insights")
+    st.subheader("🔍 Insights Principais")
 
     try:
         # ===== ANÁLISES PRINCIPAIS =====
@@ -1567,14 +1598,25 @@ def main():
             )
             return
 
-        st.title("🏆 BETANALYTICS PRO")
-        st.markdown("##### *A ferramenta definitiva para apostas em LoL*")
-        st.markdown("##### ━━━━━━━━━━━━━━━━━━━━━━━")
-        st.markdown("##### V1.0 • Created by Evaristo •  [@evaristomat](https://x.com/evaristomat)")
-        st.markdown("---")
+        # Header com estilo impactante
+        st.markdown(
+            """
+        <div style="text-align: center; margin-bottom: 30px;">
+            <h1 style="font-size: 3.15em; font-weight: bold; margin: 0; color: #FFD700;">
+                🏆 BET.ANALYTICS PRO
+            </h1>
+            <div style="font-size: 1.5em; color: #888; margin: 10px 0; letter-spacing: 2px;">
+                ━━━━━━━━━━━━━━━━━━━━━━━
+            </div>
+            <h3 style="color: #ccc; margin: 0; font-weight: 300;">
+                V1.0 • Created by <a href="https://x.com/evaristomat" target="_blank" style="color: #1DA1F2; text-decoration: none;">Evaristo</a>
+            </h3>
+        </div>
+        """,
+            unsafe_allow_html=True,
+        )
 
-
-        # Filtro de Tier (TIER 1 e TIER 2 apenas)
+        # Filtro de Liga com opções individuais
         tier1_leagues = [
             "LCK",
             "LPL",
@@ -1588,7 +1630,7 @@ def main():
         ]
         tier2_leagues = ["LPLOL", "LVP", "NLC", "LCP", "LFL", "LVP SL", "Prime League"]
 
-        all_leagues = df["league"].unique().tolist()
+        all_leagues = sorted(df["league"].unique().tolist())
 
         # Identifica quais ligas estão disponíveis
         tier1_available = [league for league in all_leagues if league in tier1_leagues]
@@ -1598,25 +1640,40 @@ def main():
             if league in tier2_leagues or league not in tier1_leagues
         ]
 
-        tier_filter = st.selectbox(
-            "Tier de Liga:",
-            options=["Todos", "🏆 TIER 1", "🥈 TIER 2"],
-            index=0,
-            help="TIER 1: Ligas principais (LCK, LPL, LEC, etc.)\nTIER 2: Ligas regionais (LPLOL, LVP, NLC, LCP, etc.)",
+        # Debug no console
+        print(
+            f"DEBUG - TIER 1 ({len(tier1_available)}): {', '.join(tier1_available) if tier1_available else 'Nenhuma'}"
+        )
+        print(
+            f"DEBUG - TIER 2 ({len(tier2_available)}): {', '.join(tier2_available) if tier2_available else 'Nenhuma'}"
         )
 
-        # Aplica filtro de tier
-        if tier_filter == "🏆 TIER 1":
+        # Seletor de liga
+        liga_options = ["Todas as Ligas", "🏆 TIER 1", "🥈 TIER 2"] + [
+            f"📍 {league}" for league in all_leagues
+        ]
+
+        liga_filter = st.selectbox(
+            "Filtrar por Liga:",
+            options=liga_options,
+            index=0,
+            help="Escolha uma liga específica ou filtre por tier",
+        )
+
+        # Aplica filtro de liga
+        if liga_filter == "🏆 TIER 1":
             selected_leagues = tier1_available if tier1_available else all_leagues
-        elif tier_filter == "🥈 TIER 2":
+        elif liga_filter == "🥈 TIER 2":
             selected_leagues = tier2_available if tier2_available else all_leagues
+        elif liga_filter.startswith("📍"):
+            selected_leagues = [liga_filter.replace("📍 ", "")]
         else:
             selected_leagues = all_leagues
 
         df = df[df["league"].isin(selected_leagues)]
 
         if df.empty:
-            st.write("No data available for the selected tier.")
+            st.write("Nenhum dado disponível para a liga selecionada.")
             return
 
         # Filtro de Mês - com tratamento robusto
@@ -1626,9 +1683,9 @@ def main():
 
             if valid_dates == 0:
                 st.info("Filtro de mês não disponível (datas inválidas).")
-                available_month_names = ["All Months"]
+                available_month_names = ["Todos os Meses"]
                 selected_month_name = st.selectbox(
-                    "Select a month:", options=available_month_names
+                    "Selecionar mês:", options=available_month_names
                 )
             else:
                 df["month"] = df["date"].dt.month
@@ -1638,19 +1695,19 @@ def main():
                 )
 
                 months = {
-                    0: "All Months",
-                    1: "January",
-                    2: "February",
-                    3: "March",
-                    4: "April",
-                    5: "May",
-                    6: "June",
-                    7: "July",
-                    8: "August",
-                    9: "September",
-                    10: "October",
-                    11: "November",
-                    12: "December",
+                    0: "Todos os Meses",
+                    1: "Janeiro",
+                    2: "Fevereiro",
+                    3: "Março",
+                    4: "Abril",
+                    5: "Maio",
+                    6: "Junho",
+                    7: "Julho",
+                    8: "Agosto",
+                    9: "Setembro",
+                    10: "Outubro",
+                    11: "Novembro",
+                    12: "Dezembro",
                 }
 
                 if available_months:
@@ -1661,10 +1718,10 @@ def main():
                     available_month_names = [months[0]]
 
                 selected_month_name = st.selectbox(
-                    "Select a month:", options=available_month_names
+                    "Selecionar mês:", options=available_month_names
                 )
 
-                if selected_month_name != "All Months":
+                if selected_month_name != "Todos os Meses":
                     selected_month_num = list(months.values()).index(
                         selected_month_name
                     )
@@ -1694,7 +1751,7 @@ def main():
                 chosen_roi = min_available_roi
             else:
                 chosen_roi = st.slider(
-                    "Choose Minimum ROI (%)",
+                    "Escolher ROI Mínimo (%)",
                     int(10),
                     int(max_available_roi),
                     int(10),
@@ -1727,7 +1784,7 @@ def main():
 
         # Exibe gráficos
         st.markdown("---")
-        st.subheader("📈 Bankroll Evolution")
+        st.subheader("📈 Evolução do Bankroll")
         try:
             bankroll_plot(processed_df)
         except Exception as e:
@@ -1738,6 +1795,14 @@ def main():
         display_apostas_do_dia()
 
         display_apostas_amanha()
+
+        # Gráfico de Lucro por Liga
+        st.markdown("---")
+        st.subheader("🏆 Análise de Lucro por Liga")
+        try:
+            league_profit_plot(processed_df)
+        except Exception as e:
+            st.error(f"Erro no gráfico de lucro por liga: {e}")
 
         # Seção de Apostas em Vigor
         st.markdown("---")
@@ -1831,28 +1896,28 @@ def main():
             st.error(f"Erro ao mostrar dados detalhados: {e}")
 
         st.markdown("---")
-        st.subheader("🎯 Profitability Analysis by Odds Range")
+        st.subheader("🎯 Análise de Lucratividade por Faixa de Odds")
         try:
             odds_plot(processed_df)
         except Exception as e:
             st.error(f"Erro no gráfico de odds: {e}")
 
         st.markdown("---")
-        st.subheader("📊 Bet Groups Distribution")
+        st.subheader("📊 Distribuição de Grupos de Apostas")
         try:
             bet_groups_plot(processed_df)
         except Exception as e:
             st.error(f"Erro no gráfico de grupos: {e}")
 
         st.markdown("---")
-        st.subheader("💰 Profit Analysis")
+        st.subheader("💰 Análise de Lucro")
         try:
             profit_plot(processed_df)
         except Exception as e:
             st.error(f"Erro no gráfico de profit: {e}")
 
         st.markdown("---")
-        st.subheader("🗺️ Map Analysis")
+        st.subheader("🗺️ Análise por Mapa")
         try:
             map_analysis_plot(processed_df)
         except Exception as e:
