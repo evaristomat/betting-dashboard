@@ -244,48 +244,331 @@ def league_profit_plot(df: pd.DataFrame) -> None:
     st.pyplot(plt.gcf())
 
 
-def odds_plot(df: pd.DataFrame) -> None:
-    """Análise de lucratividade por faixas de odds."""
+def odds_plot(df):
+    """
+    Análise de lucratividade por faixas de odds com categorias específicas.
+
+    IMPORTANTE: Usa ROI REAL baseado nos resultados das apostas, não o ROI estimado.
+    - ROI Real = (Lucro Total / Total Apostado) * 100
+    - Cada aposta = 1 unit, então Total Apostado = número de apostas
+
+    Categorias:
+    - <1.5: Odds muito baixas
+    - 1.5-1.69: Odds baixas
+    - 1.7-1.99: Odds médias baixas
+    - 2.0-2.2: Odds médias
+    - 2.21-2.5: Odds médias altas
+    - 2.51-3.0: Odds altas
+    - 3.01-4.0: Odds muito altas
+    - 4.01-5.0: Odds extremas
+    - >5.0: Odds máximas
+    """
+    import streamlit as st
+    import pandas as pd
+    import matplotlib.pyplot as plt
+
     if df.empty or df["odds"].isna().all():
         st.warning("Nenhum dado de odds disponível.")
         return
 
-    def categorize(x):
-        if x < 1.5:
+    def categorize_odds(x):
+        """Categoriza as odds em faixas específicas"""
+        if pd.isna(x):
+            return "N/A"
+        elif x < 1.5:
             return "<1.5"
-        elif x < 2.1:
-            return "1.5-2.1"
-        elif x < 2.5:
-            return "2.0-2.49"
-        elif x < 3.0:
-            return "2.5-2.99"
+        elif x < 1.7:
+            return "1.5-1.69"
+        elif x < 2.0:
+            return "1.7-1.99"
+        elif x <= 2.2:
+            return "2.0-2.2"
+        elif x <= 2.5:
+            return "2.21-2.5"
+        elif x <= 3.0:
+            return "2.51-3.0"
+        elif x <= 4.0:
+            return "3.01-4.0"
+        elif x <= 5.0:
+            return "4.01-5.0"
         else:
-            return "≥3.0"
+            return ">5.0"
 
+    def calc_roi_real(group_data):
+        """Calcula ROI REAL baseado no lucro real das apostas"""
+        try:
+            # ROI Real = (Lucro Total / Total Apostado) * 100
+            # Como cada aposta é 1 unit, Total Apostado = número de apostas
+            total_apostado = len(group_data)  # cada aposta = 1 unit
+            lucro_total = group_data["profit"].sum()
+
+            if total_apostado > 0:
+                roi_real = (lucro_total / total_apostado) * 100
+                return roi_real
+            else:
+                return 0
+        except:
+            return 0
+
+    def calc_win_rate(status_series):
+        """Calcula win rate baseado na coluna status"""
+        try:
+            return (status_series == "win").mean() * 100
+        except:
+            return 0
+
+    # Criar cópia e categorizar
     df_copy = df.copy()
-    df_copy["odds_cat"] = df_copy["odds"].apply(categorize)
-    stats = (
-        df_copy.groupby("odds_cat")
-        .agg(
-            Lucro_Total=("profit", "sum"),
-            Total_Apostas=("profit", "count"),
-        )
-        .reindex(["<1.5", "1.5-2.10", "2.0-2.49", "2.5-2.99", "≥3.0"])
-        .dropna()
-    )
-    if stats.empty:
+    df_copy["odds_cat"] = df_copy["odds"].apply(categorize_odds)
+
+    # Definir ordem das categorias
+    category_order = [
+        "<1.5",
+        "1.5-1.69",
+        "1.7-1.99",
+        "2.0-2.2",
+        "2.21-2.5",
+        "2.51-3.0",
+        "3.01-4.0",
+        "4.01-5.0",
+        ">5.0",
+    ]
+
+    # Calcular estatísticas por categoria
+    grouped = df_copy.groupby("odds_cat")
+
+    stats_data = {}
+    for cat in category_order:
+        if cat in grouped.groups:
+            group_data = grouped.get_group(cat)
+            stats_data[cat] = {
+                "Lucro_Total": group_data["profit"].sum(),
+                "Total_Apostas": len(group_data),
+                "ROI_Real": calc_roi_real(group_data),  # ROI REAL baseado no lucro
+                "Win_Rate": calc_win_rate(group_data["status"]),
+            }
+
+    if not stats_data:
         st.warning("Dados insuficientes para análise de odds.")
         return
-    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
-    colors = ["green" if v >= 0 else "red" for v in stats["Lucro_Total"]]
-    axes[0].bar(stats.index, stats["Lucro_Total"], color=colors)
-    axes[0].set_title("Lucro por Faixa de Odds")
-    axes[1].bar(stats.index, stats["Total_Apostas"], color="blue")
-    axes[1].set_title("Número de Apostas por Faixa")
-    for ax in axes:
+
+    # Converter para DataFrame
+    stats = pd.DataFrame(stats_data).T
+
+    # Configurar cores baseadas na lucratividade
+    colors_profit = []
+    for lucro in stats["Lucro_Total"]:
+        if lucro > 5:
+            colors_profit.append("#00C851")  # Verde forte
+        elif lucro > 0:
+            colors_profit.append("#4CAF50")  # Verde
+        elif lucro > -5:
+            colors_profit.append("#FF9800")  # Laranja
+        else:
+            colors_profit.append("#F44336")  # Vermelho
+
+    # Criar subplots
+    fig, axes = plt.subplots(2, 2, figsize=(16, 12))
+    fig.suptitle("ANALISE COMPLETA POR FAIXAS DE ODDS", fontsize=16, fontweight="bold")
+
+    # 1. Gráfico de Lucro Total
+    ax1 = axes[0, 0]
+    bars1 = ax1.bar(stats.index, stats["Lucro_Total"], color=colors_profit, alpha=0.8)
+    ax1.set_title("Lucro Total por Faixa de Odds", fontweight="bold")
+    ax1.set_ylabel("Lucro (units)")
+    ax1.axhline(y=0, color="black", linestyle="-", alpha=0.3)
+    ax1.grid(axis="y", alpha=0.3)
+
+    # Adicionar valores nas barras
+    for bar in bars1:
+        height = bar.get_height()
+        ax1.annotate(
+            f"{height:.1f}",
+            xy=(bar.get_x() + bar.get_width() / 2, height),
+            xytext=(0, 3),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            fontweight="bold",
+        )
+
+    # 2. Gráfico de Número de Apostas
+    ax2 = axes[0, 1]
+    bars2 = ax2.bar(stats.index, stats["Total_Apostas"], color="#2196F3", alpha=0.7)
+    ax2.set_title("Volume de Apostas por Faixa", fontweight="bold")
+    ax2.set_ylabel("Número de Apostas")
+    ax2.grid(axis="y", alpha=0.3)
+
+    # Adicionar valores nas barras
+    for bar in bars2:
+        height = bar.get_height()
+        ax2.annotate(
+            f"{int(height)}",
+            xy=(bar.get_x() + bar.get_width() / 2, height),
+            xytext=(0, 3),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            fontweight="bold",
+        )
+
+    # 3. Gráfico de ROI Real
+    ax3 = axes[1, 0]
+    colors_roi = []
+    for roi in stats["ROI_Real"]:
+        if roi > 10:
+            colors_roi.append("#00C851")
+        elif roi > 0:
+            colors_roi.append("#4CAF50")
+        elif roi > -10:
+            colors_roi.append("#FF9800")
+        else:
+            colors_roi.append("#F44336")
+
+    bars3 = ax3.bar(stats.index, stats["ROI_Real"], color=colors_roi, alpha=0.8)
+    ax3.set_title("ROI Real por Faixa de Odds", fontweight="bold")
+    ax3.set_ylabel("ROI Real (%)")
+    ax3.axhline(y=0, color="black", linestyle="-", alpha=0.3)
+    ax3.grid(axis="y", alpha=0.3)
+
+    # Adicionar valores nas barras
+    for bar in bars3:
+        height = bar.get_height()
+        ax3.annotate(
+            f"{height:.1f}%",
+            xy=(bar.get_x() + bar.get_width() / 2, height),
+            xytext=(0, 3),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            fontweight="bold",
+        )
+
+    # 4. Gráfico de Win Rate
+    ax4 = axes[1, 1]
+    colors_wr = []
+    for wr in stats["Win_Rate"]:
+        if wr > 60:
+            colors_wr.append("#00C851")
+        elif wr > 50:
+            colors_wr.append("#4CAF50")
+        elif wr > 40:
+            colors_wr.append("#FF9800")
+        else:
+            colors_wr.append("#F44336")
+
+    bars4 = ax4.bar(stats.index, stats["Win_Rate"], color=colors_wr, alpha=0.8)
+    ax4.set_title("Win Rate por Faixa de Odds", fontweight="bold")
+    ax4.set_ylabel("Win Rate (%)")
+    ax4.set_ylim(0, 100)
+    ax4.axhline(y=50, color="black", linestyle="--", alpha=0.5, label="50% (neutro)")
+    ax4.grid(axis="y", alpha=0.3)
+    ax4.legend()
+
+    # Adicionar valores nas barras
+    for bar in bars4:
+        height = bar.get_height()
+        ax4.annotate(
+            f"{height:.1f}%",
+            xy=(bar.get_x() + bar.get_width() / 2, height),
+            xytext=(0, 3),
+            textcoords="offset points",
+            ha="center",
+            va="bottom",
+            fontsize=9,
+            fontweight="bold",
+        )
+
+    # Ajustar rotação dos labels nos eixos x
+    for ax in axes.flat:
         ax.tick_params(axis="x", rotation=45)
+        ax.set_xlabel("Faixa de Odds")
+
     plt.tight_layout()
     st.pyplot(fig)
+
+    # Adicionar tabela de resumo
+    st.markdown("### 📋 **RESUMO DETALHADO POR FAIXA DE ODDS**")
+
+    # Preparar dados da tabela
+    summary_data = []
+    for idx, row in stats.iterrows():
+        lucro_icon = "🟢" if row["Lucro_Total"] > 0 else "🔴"
+        roi_icon = (
+            "🚀" if row["ROI_Real"] > 15 else "✅" if row["ROI_Real"] > 0 else "❌"
+        )
+        wr_icon = (
+            "🏆" if row["Win_Rate"] > 60 else "✅" if row["Win_Rate"] > 50 else "⚠️"
+        )
+
+        summary_data.append(
+            {
+                "Faixa de Odds": idx,
+                "Apostas": int(row["Total_Apostas"]),
+                "Lucro": f"{lucro_icon} {row['Lucro_Total']:.2f}U",
+                "ROI Real": f"{roi_icon} {row['ROI_Real']:.1f}%",
+                "Win Rate": f"{wr_icon} {row['Win_Rate']:.1f}%",
+                "Lucro/Aposta": f"{row['Lucro_Total'] / row['Total_Apostas']:.3f}U",
+            }
+        )
+
+    summary_df = pd.DataFrame(summary_data)
+    st.dataframe(summary_df, use_container_width=True)
+
+    # Insights automáticos
+    st.markdown("### 💡 **INSIGHTS AUTOMÁTICOS**")
+
+    # Encontrar melhor e pior faixa
+    best_roi_idx = stats["ROI_Real"].idxmax()
+    worst_roi_idx = stats["ROI_Real"].idxmin()
+    most_volume_idx = stats["Total_Apostas"].idxmax()
+    most_profit_idx = stats["Lucro_Total"].idxmax()
+
+    col1, col2 = st.columns(2)
+
+    with col1:
+        st.success(
+            f"🏆 **Melhor ROI Real:** {best_roi_idx} ({stats.loc[best_roi_idx, 'ROI_Real']:.1f}%)"
+        )
+        st.info(
+            f"📊 **Maior Volume:** {most_volume_idx} ({int(stats.loc[most_volume_idx, 'Total_Apostas'])} apostas)"
+        )
+
+    with col2:
+        st.success(
+            f"💰 **Maior Lucro:** {most_profit_idx} ({stats.loc[most_profit_idx, 'Lucro_Total']:.2f}U)"
+        )
+        st.error(
+            f"📉 **Pior ROI Real:** {worst_roi_idx} ({stats.loc[worst_roi_idx, 'ROI_Real']:.1f}%)"
+        )
+
+    # Recomendações baseadas na análise
+    st.markdown("### 🎯 **RECOMENDAÇÕES ESTRATÉGICAS**")
+
+    profitable_ranges = stats[stats["Lucro_Total"] > 0].index.tolist()
+    unprofitable_ranges = stats[stats["Lucro_Total"] < 0].index.tolist()
+
+    if profitable_ranges:
+        st.success(f"✅ **FOCAR:** {', '.join(profitable_ranges)} (faixas lucrativas)")
+
+    if unprofitable_ranges:
+        st.warning(
+            f"⚠️ **EVITAR:** {', '.join(unprofitable_ranges)} (faixas com prejuízo)"
+        )
+
+    # Alertas específicos
+    median_volume = stats["Total_Apostas"].median()
+    high_volume_low_profit = stats[
+        (stats["Total_Apostas"] > median_volume) & (stats["Lucro_Total"] < 0)
+    ].index.tolist()
+
+    if high_volume_low_profit:
+        st.error(
+            f"🚨 **ATENÇÃO:** {', '.join(high_volume_low_profit)} têm alto volume mas geram prejuízo!"
+        )
 
 
 def bet_groups_plot(df):

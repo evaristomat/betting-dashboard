@@ -402,10 +402,12 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 7 Jun 2025 12:00,LEC,Movistar KOI,Karmine Corp,under,total_towers 12.5,13.0,14.38%,1.6,1.83,BET365,url não disponível,loss,,-1.0,2
 7 Jun 2025 12:00,LEC,Movistar KOI,Karmine Corp,under,total_towers 12.5,10.0,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,3
 7 Jun 2025 12:00,LEC,Movistar KOI,Karmine Corp,under,total_towers 12.5,11.0,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,4
+7 Jun 2025 12:00,LEC,Movistar KOI,Karmine Corp,under,total_towers 12.5,14.0,14.38%,1.6,1.83,BET365,url não disponível,loss,,-1.0,5
 7 Jun 2025 12:00,LEC,Movistar KOI,Karmine Corp,under,total_barons 1.5,1.0,12.20%,1.21,1.36,BET365,url não disponível,win,,0.36,1
 7 Jun 2025 12:00,LEC,Movistar KOI,Karmine Corp,under,total_barons 1.5,2.0,12.20%,1.21,1.36,BET365,url não disponível,loss,,-1.0,2
 7 Jun 2025 12:00,LEC,Movistar KOI,Karmine Corp,under,total_barons 1.5,1.0,12.20%,1.21,1.36,BET365,url não disponível,win,,0.36,3
 7 Jun 2025 12:00,LEC,Movistar KOI,Karmine Corp,under,total_barons 1.5,1.0,12.20%,1.21,1.36,BET365,url não disponível,win,,0.36,4
+7 Jun 2025 12:00,LEC,Movistar KOI,Karmine Corp,under,total_barons 1.5,1.0,12.20%,1.21,1.36,BET365,url não disponível,win,,0.36,5
 7 Jun 2025 13:00,LTA S,Vivo Keyd Stars,Isurus Estral,under,total_dragons 4.5,5.0,38.25%,1.52,2.1,BET365,url não disponível,loss,,-1.0,1
 7 Jun 2025 13:00,LTA S,Vivo Keyd Stars,Isurus Estral,under,total_dragons 4.5,6.0,38.25%,1.52,2.1,BET365,url não disponível,loss,,-1.0,2
 7 Jun 2025 13:00,LTA S,Vivo Keyd Stars,Isurus Estral,under,total_dragons 4.5,4.0,38.25%,1.52,2.1,BET365,url não disponível,win,,1.1,3
@@ -424,3 +426,18 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 7 Jun 2025 06:30,LCP,TALON,GAM Esports,under,total_inhibitors 1.5,3.0,20.00%,1.67,2.0,BET365,url não disponível,loss,,-1.0,2
 7 Jun 2025 06:30,LCP,TALON,GAM Esports,under,total_inhibitors 1.5,2.0,20.00%,1.67,2.0,BET365,url não disponível,loss,,-1.0,3
 7 Jun 2025 06:30,LCP,TALON,GAM Esports,under,total_inhibitors 1.5,1.0,20.00%,1.67,2.0,BET365,url não disponível,win,,1.0,4
+8 Jun 2025 03:00,LCK,Nongshim RedForce,KT Rolster,under,total_dragons 4.5,4.0,10.00%,1.82,2.0,BET365,url não disponível,win,,1.0,1
+8 Jun 2025 03:00,LCK,Nongshim RedForce,KT Rolster,under,total_dragons 4.5,4.0,10.00%,1.82,2.0,BET365,url não disponível,win,,1.0,2
+8 Jun 2025 03:00,LCK,Nongshim RedForce,KT Rolster,under,total_dragons 4.5,4.0,10.00%,1.82,2.0,BET365,url não disponível,win,,1.0,3
+8 Jun 2025 03:00,LCK,Nongshim RedForce,KT Rolster,under,total_towers 11.5,12.0,35.00%,1.67,2.25,BET365,url não disponível,loss,,-1.0,1
+8 Jun 2025 03:00,LCK,Nongshim RedForce,KT Rolster,under,total_towers 11.5,11.0,35.00%,1.67,2.25,BET365,url não disponível,win,,1.25,2
+8 Jun 2025 03:00,LCK,Nongshim RedForce,KT Rolster,under,total_towers 11.5,14.0,35.00%,1.67,2.25,BET365,url não disponível,loss,,-1.0,3
+8 Jun 2025 03:00,LCK,Nongshim RedForce,KT Rolster,under,game_duration 32.5,27.77,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,1
+8 Jun 2025 03:00,LCK,Nongshim RedForce,KT Rolster,under,game_duration 32.5,26.8,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,2
+8 Jun 2025 03:00,LCK,Nongshim RedForce,KT Rolster,under,game_duration 32.5,29.1,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,3
+8 Jun 2025 03:00,LCK,Nongshim RedForce,KT Rolster,under,total_barons 1.5,1.0,22.50%,1.14,1.4,BET365,url não disponível,win,,0.4,1
+8 Jun 2025 03:00,LCK,Nongshim RedForce,KT Rolster,under,total_barons 1.5,1.0,22.50%,1.14,1.4,BET365,url não disponível,win,,0.4,2
+8 Jun 2025 03:00,LCK,Nongshim RedForce,KT Rolster,under,total_barons 1.5,1.0,22.50%,1.14,1.4,BET365,url não disponível,win,,0.4,3
+8 Jun 2025 06:30,LCP,CTBC Flying Oyster,GAM Esports,under,total_barons 1.5,1.0,12.00%,1.14,1.28,BET365,url não disponível,win,,0.28,1
+8 Jun 2025 06:30,LCP,CTBC Flying Oyster,GAM Esports,under,total_barons 1.5,2.0,12.00%,1.14,1.28,BET365,url não disponível,loss,,-1.0,2
+8 Jun 2025 06:30,LCP,CTBC Flying Oyster,GAM Esports,under,total_barons 1.5,1.0,12.00%,1.14,1.28,BET365,url não disponível,win,,0.28,3

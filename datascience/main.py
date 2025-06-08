@@ -1,53 +1,51 @@
 import pandas as pd
 import numpy as np
-from datetime import datetime
 import warnings
 
 warnings.filterwarnings("ignore")
 
 
 def complete_betting_analysis_with_backtest(file_path):
-    """Análise completa + backtest da estratégia otimizada"""
+    """Análise completa focada em LUCRO REAL + backtest da estratégia otimizada com ranges de ROI.
+    VERSÃO COM INHIBITORS INCLUÍDOS - Odds ajustadas com nova categoria media_alta."""
 
+    # Carrega dados
     df = pd.read_csv(file_path)
-    df["date"] = pd.to_datetime(df["date"], errors="coerce")
+    df["date"] = pd.to_datetime(df["date"], format="%d %b %Y %H:%M", errors="coerce")
     df["profit"] = pd.to_numeric(df["profit"], errors="coerce")
 
-    print("🎯 ANÁLISE COMPLETA + BACKTEST DA ESTRATÉGIA OTIMIZADA")
+    print("🎯 ANÁLISE COMPLETA FOCADA EM LUCRO REAL + BACKTEST OTIMIZADO")
+    print("✅ INCLUINDO MERCADOS DE INHIBITOR + ODDS AJUSTADAS")
     print("=" * 80)
 
-    # Função para categorizar mercados
+    # Categorização de mercado
     def categorize_market(bet_type, bet_line):
-        bet_line_str = str(bet_line).lower()
-        bet_type_str = str(bet_type).lower()
-
-        direction = "UNDER" if "under" in bet_type_str else "OVER"
-
-        if "kill" in bet_line_str:
+        lt = str(bet_type).lower()
+        ll = str(bet_line).lower()
+        direction = "UNDER" if "under" in lt else "OVER"
+        if "kill" in ll:
             market = "KILLS"
-        elif "dragon" in bet_line_str:
+        elif "dragon" in ll:
             market = "DRAGONS"
-        elif "tower" in bet_line_str:
+        elif "tower" in ll:
             market = "TOWERS"
-        elif "duration" in bet_line_str or "tempo" in bet_line_str:
+        elif "duration" in ll or "tempo" in ll:
             market = "DURATION"
-        elif "baron" in bet_line_str:
+        elif "baron" in ll:
             market = "BARONS"
-        elif "inhibitor" in bet_line_str:
+        elif "inhibitor" in ll:
             market = "INHIBITORS"
         else:
             market = "OUTROS"
-
         return direction, market, f"{direction} - {market}"
 
-    # Aplicar categorização
     df[["direction", "market_type", "grouped_market"]] = df.apply(
-        lambda row: categorize_market(row["bet_type"], row["bet_line"]),
+        lambda r: categorize_market(r["bet_type"], r["bet_line"]),
         axis=1,
         result_type="expand",
     )
 
-    # Categorizar odds, agora incluindo o intervalo no nome
+    # Nova categorização de odds com faixa media_alta
     def categorize_odds(odds):
         if pd.isna(odds):
             return "N/A"
@@ -66,424 +64,539 @@ def complete_betting_analysis_with_backtest(file_path):
 
     df["odds_category"] = df["odds"].apply(categorize_odds)
 
-    # 1. ANÁLISE INICIAL DOS DADOS
-    print(f"\n📊 DADOS GERAIS:")
-    print(f"   Total de apostas: {len(df)}")
-    print(f"   Lucro total atual: {df['profit'].sum():.2f} unidades")
-    print(f"   ROI médio atual: {(df['profit'].sum() / len(df) * 100):.2f}%")
-    print(f"   Win rate geral: {(df['status'] == 'win').mean() * 100:.1f}%")
+    # Métricas gerais (COM INHIBITORS)
+    total = len(df)
+    profit_total = df["profit"].sum()
+    roi_avg = profit_total / total * 100
+    win_rate = df["status"].eq("win").mean() * 100
 
-    # 2. IDENTIFICAR ESTRATÉGIAS LUCRATIVAS
+    print(f"\n📊 DADOS GERAIS (COM INHIBITORS):")
+    print(f"   Total de apostas: {total}")
+    print(f"   Lucro total: {profit_total:.2f} unidades")
+    print(f"   ROI médio: {roi_avg:.2f}%")
+    print(f"   Win rate geral: {win_rate:.1f}%")
+
+    # Mostrar distribuição de mercados incluindo INHIBITORS
+    print(f"\n📈 DISTRIBUIÇÃO POR TIPO DE MERCADO:")
+    market_distribution = df["market_type"].value_counts()
+    for market, count in market_distribution.items():
+        percentage = count / total * 100
+        market_profit = df[df["market_type"] == market]["profit"].sum()
+        print(
+            f"   {market}: {count} apostas ({percentage:.1f}%) - Lucro: {market_profit:.2f}"
+        )
+
+    # ========================================================================
+    # 1. ANÁLISE POR ROI ESTIMADO (RANGES MAIORES)
+    # ========================================================================
     print(f"\n" + "=" * 80)
-    print("📈 IDENTIFICANDO ESTRATÉGIAS LUCRATIVAS")
+    print("📈 ANÁLISE POR RANGES DE ROI ESTIMADO (COM INHIBITORS)")
     print("=" * 80)
 
-    # Análise por mercado
+    # Converter ROI estimado para numérico
+    df["estimated_roi"] = df["ROI"].str.rstrip("%").astype(float)
+
+    # Definir ranges de ROI maiores (cumulativos)
+    def categorize_roi_ranges(roi):
+        if pd.isna(roi):
+            return "N/A"
+        elif roi < 15:
+            return "<15%"
+        elif roi >= 30:
+            return "≥30%"
+        elif roi >= 25:
+            return "≥25%"
+        elif roi >= 20:
+            return "≥20%"
+        else:  # 15-19.99%
+            return "15-20%"
+
+    df["est_roi_category"] = df["estimated_roi"].apply(categorize_roi_ranges)
+
+    # Análise por faixa de ROI estimado
+    roi_est_analysis = (
+        df.groupby("est_roi_category")
+        .agg(
+            {
+                "profit": ["sum", "count"],
+                "estimated_roi": "mean",
+                "status": lambda x: (x == "win").mean() * 100,
+            }
+        )
+        .round(2)
+    )
+
+    roi_est_analysis.columns = ["Total_Profit", "Bets", "Avg_Est_ROI", "Win_Rate"]
+    roi_est_analysis["Real_ROI"] = (
+        roi_est_analysis["Total_Profit"] / roi_est_analysis["Bets"] * 100
+    ).round(2)
+    roi_est_analysis["ROI_Accuracy"] = (
+        roi_est_analysis["Real_ROI"] / roi_est_analysis["Avg_Est_ROI"] * 100
+    ).round(1)
+    roi_est_analysis = roi_est_analysis.sort_values("Real_ROI", ascending=False)
+
+    print(f"\n🎲 PERFORMANCE POR RANGE DE ROI ESTIMADO:")
+    print(
+        f"{'Status':<3} {'Range':<8} {'Lucro':<10} {'ROI Real':<10} {'ROI Est':<10} {'Precisão':<10} {'Win Rate':<10} {'Apostas':<8}"
+    )
+    print("-" * 85)
+
+    for range_roi, row in roi_est_analysis.iterrows():
+        icon = "✅" if row["Real_ROI"] > 0 else "❌"
+        print(
+            f"{icon:<3} {range_roi:<8} {row['Total_Profit']:>8.2f} {row['Real_ROI']:>9.1f}% "
+            f"{row['Avg_Est_ROI']:>9.1f}% {row['ROI_Accuracy']:>9.1f}% {row['Win_Rate']:>9.1f}% {int(row['Bets']):>8}"
+        )
+
+    # Selecionar ranges baseado APENAS em lucro e ROI real
+    best_est_roi_categories = roi_est_analysis[
+        (roi_est_analysis["Total_Profit"] > 1)  # Lucro mínimo de 1 unidade
+        & (roi_est_analysis["Real_ROI"] > 0)  # ROI positivo
+        & (roi_est_analysis["Bets"] >= 5)  # Volume mínimo
+    ].index.tolist()
+
+    print(
+        f"\n💎 RANGES SELECIONADOS (BASEADO EM LUCRO REAL): {best_est_roi_categories}"
+    )
+
+    # Mostrar potencial de lucro
+    total_profit_selected = roi_est_analysis.loc[
+        best_est_roi_categories, "Total_Profit"
+    ].sum()
+    total_bets_selected = roi_est_analysis.loc[best_est_roi_categories, "Bets"].sum()
+    weighted_roi = (
+        (total_profit_selected / total_bets_selected * 100)
+        if total_bets_selected > 0
+        else 0
+    )
+
+    print(f"📊 POTENCIAL DOS RANGES SELECIONADOS:")
+    print(f"   💰 Lucro total: {total_profit_selected:.2f} unidades")
+    print(f"   🎲 Apostas: {int(total_bets_selected)}")
+    print(f"   📈 ROI médio ponderado: {weighted_roi:.2f}%")
+
+    # ========================================================================
+    # 2. FILTRAR DADOS POR ROI ESTIMADO LUCRATIVO
+    # ========================================================================
+    df_filtered = df[df["est_roi_category"].isin(best_est_roi_categories)]
+
+    print(f"\n📊 DADOS FILTRADOS POR RANGES DE ROI:")
+    print(f"   Apostas originais: {len(df)}")
+    print(f"   Apostas após filtro ROI: {len(df_filtered)}")
+    print(f"   Taxa de aprovação: {len(df_filtered) / len(df) * 100:.1f}%")
+    print(f"   Lucro filtrado: {df_filtered['profit'].sum():.2f} unidades")
+
+    # ========================================================================
+    # 3. ANÁLISE POR MERCADO (DADOS FILTRADOS) - INCLUINDO INHIBITORS
+    # ========================================================================
+    print(f"\n" + "=" * 80)
+    print("🏆 PERFORMANCE POR MERCADO (RANGES ROI FILTRADOS - COM INHIBITORS)")
+    print("=" * 80)
+
     market_analysis = (
-        df.groupby("grouped_market")
-        .agg(
-            {"profit": ["sum", "count", "mean"], "status": lambda x: (x == "win").sum()}
-        )
-        .round(4)
-    )
-
-    market_analysis.columns = ["Total_Profit", "Total_Bets", "Avg_Profit", "Wins"]
-    market_analysis["Win_Rate"] = (
-        market_analysis["Wins"] / market_analysis["Total_Bets"] * 100
-    ).round(2)
-    market_analysis["ROI"] = (
-        market_analysis["Total_Profit"] / market_analysis["Total_Bets"] * 100
-    ).round(2)
-    market_analysis = market_analysis.sort_values("Total_Profit", ascending=False)
-
-    print(f"\n🏆 PERFORMANCE POR MERCADO:")
-    for market, stats in market_analysis.iterrows():
-        status = "✅" if stats["Total_Profit"] > 0 else "❌"
-        print(
-            f"   {status} {market:<25}: {stats['Total_Profit']:>7.2f} unidades | ROI: {stats['ROI']:>5.1f}% | Apostas: {stats['Total_Bets']:>3.0f}"
-        )
-
-    # Análise por odds
-    odds_analysis = (
-        df.groupby("odds_category")
-        .agg(
-            {"profit": ["sum", "count", "mean"], "status": lambda x: (x == "win").sum()}
-        )
-        .round(4)
-    )
-
-    odds_analysis.columns = ["Total_Profit", "Total_Bets", "Avg_Profit", "Wins"]
-    odds_analysis["ROI"] = (
-        odds_analysis["Total_Profit"] / odds_analysis["Total_Bets"] * 100
-    ).round(2)
-    odds_analysis = odds_analysis.sort_values("Total_Profit", ascending=False)
-
-    print(f"\n🎲 PERFORMANCE POR FAIXA DE ODDS:")
-    for odds_cat, stats in odds_analysis.iterrows():
-        status = "✅" if stats["Total_Profit"] > 0 else "❌"
-        print(
-            f"   {status} {odds_cat:<15}: {stats['Total_Profit']:>7.2f} unidades | ROI: {stats['ROI']:>5.1f}% | Apostas: {stats['Total_Bets']:>3.0f}"
-        )
-
-    # Análise UNDER vs OVER
-    direction_analysis = (
-        df.groupby("direction")
-        .agg(
-            {"profit": ["sum", "count", "mean"], "status": lambda x: (x == "win").sum()}
-        )
-        .round(4)
-    )
-
-    direction_analysis.columns = ["Total_Profit", "Total_Bets", "Avg_Profit", "Wins"]
-    direction_analysis["ROI"] = (
-        direction_analysis["Total_Profit"] / direction_analysis["Total_Bets"] * 100
-    ).round(2)
-
-    print(f"\n🔽 PERFORMANCE UNDER vs OVER:")
-    for direction, stats in direction_analysis.iterrows():
-        status = "✅" if stats["Total_Profit"] > 0 else "❌"
-        print(
-            f"   {status} {direction:<5}: {stats['Total_Profit']:>7.2f} unidades | ROI: {stats['ROI']:>5.1f}% | Apostas: {stats['Total_Bets']:>3.0f}"
-        )
-
-    # 3. DEFINIR ESTRATÉGIA OTIMIZADA BASEADA NOS DADOS
-    print(f"\n" + "=" * 80)
-    print("🎯 DEFININDO ESTRATÉGIA OTIMIZADA")
-    print("=" * 80)
-
-    # Identificar mercados lucrativos (ROI > 0 e lucro > 1 unidade)
-    profitable_markets = market_analysis[
-        (market_analysis["Total_Profit"] > 0)
-        & (market_analysis["ROI"] > 0)
-        & (market_analysis["Total_Bets"] >= 5)  # Mínimo de volume
-    ].index.tolist()
-
-    # Identificar faixas de odds lucrativas
-    profitable_odds = odds_analysis[
-        (odds_analysis["Total_Profit"] > 0) & (odds_analysis["ROI"] > 0)
-    ].index.tolist()
-
-    # Identificar direção lucrativa
-    profitable_direction = direction_analysis[
-        direction_analysis["Total_Profit"] > 0
-    ].index.tolist()
-
-    print(f"\n📋 CRITÉRIOS DA ESTRATÉGIA OTIMIZADA:")
-    print(f"   ✅ Mercados lucrativos: {profitable_markets}")
-    print(f"   ✅ Faixas de odds lucrativas: {profitable_odds}")
-    print(f"   ✅ Direção lucrativa: {profitable_direction}")
-
-    # Critérios extras baseados na análise
-    print(f"\n📋 CRITÉRIOS ADICIONAIS:")
-    print(f"   ✅ ROI mínimo por mercado: >0%")
-    print(f"   ✅ Volume mínimo: ≥5 apostas por mercado")
-    print(f"   ✅ Foco em inhibitors (melhor ROI)")
-    print(f"   ❌ Evitar mercados com ROI <-5%")
-
-    # 4. APLICAR ESTRATÉGIA OTIMIZADA (BACKTEST)
-    print(f"\n" + "=" * 80)
-    print("🚀 BACKTEST DA ESTRATÉGIA OTIMIZADA")
-    print("=" * 80)
-
-    # Filtros da estratégia otimizada
-    def apply_optimized_strategy(row):
-        # Critério 1: Mercado deve ser lucrativo
-        if row["grouped_market"] not in profitable_markets:
-            return False, "mercado_nao_lucrativo"
-
-        # Critério 2: Odds deve estar na faixa lucrativa
-        if row["odds_category"] not in profitable_odds:
-            return False, "odds_nao_lucrativa"
-
-        # Critério 3: Direção deve ser lucrativa
-        if row["direction"] not in profitable_direction:
-            return False, "direcao_nao_lucrativa"
-
-        # Critério 4: Priorizar inhibitors (sempre incluir)
-        if row["market_type"] == "INHIBITORS":
-            return True, "inhibitors_priority"
-
-        # Critério 5: ROI histórico do mercado deve ser positivo
-        market_roi = market_analysis.loc[row["grouped_market"], "ROI"]
-        if market_roi <= 0:
-            return False, "roi_negativo"
-
-        return True, "aprovado"
-
-    # Aplicar estratégia
-    strategy_results = df.apply(apply_optimized_strategy, axis=1)
-    df["strategy_approved"] = [result[0] for result in strategy_results]
-    df["strategy_reason"] = [result[1] for result in strategy_results]
-
-    # Separar apostas
-    original_bets = df.copy()
-    optimized_bets = df[df["strategy_approved"] == True].copy()
-    rejected_bets = df[df["strategy_approved"] == False].copy()
-
-    print(f"\n📊 RESULTADOS DO BACKTEST:")
-    print(f"   📈 Apostas originais: {len(original_bets)}")
-    print(f"   ✅ Apostas aprovadas pela estratégia: {len(optimized_bets)}")
-    print(f"   ❌ Apostas rejeitadas: {len(rejected_bets)}")
-    print(
-        f"   📊 Taxa de aprovação: {len(optimized_bets) / len(original_bets) * 100:.1f}%"
-    )
-
-    # 5. COMPARAÇÃO DETALHADA
-    print(f"\n" + "=" * 80)
-    print("📊 COMPARAÇÃO: ATUAL vs ESTRATÉGIA OTIMIZADA")
-    print("=" * 80)
-
-    # Métricas originais
-    original_profit = original_bets["profit"].sum()
-    original_bets_count = len(original_bets)
-    original_roi = original_profit / original_bets_count * 100
-    original_wr = (original_bets["status"] == "win").mean() * 100
-
-    # Métricas otimizadas
-    optimized_profit = optimized_bets["profit"].sum()
-    optimized_bets_count = len(optimized_bets)
-    optimized_roi = (
-        (optimized_profit / optimized_bets_count * 100)
-        if optimized_bets_count > 0
-        else 0
-    )
-    optimized_wr = (
-        (optimized_bets["status"] == "win").mean() * 100
-        if optimized_bets_count > 0
-        else 0
-    )
-
-    # Métricas rejeitadas
-    rejected_profit = rejected_bets["profit"].sum()
-    rejected_bets_count = len(rejected_bets)
-    rejected_roi = (
-        (rejected_profit / rejected_bets_count * 100) if rejected_bets_count > 0 else 0
-    )
-    rejected_wr = (
-        (rejected_bets["status"] == "win").mean() * 100
-        if rejected_bets_count > 0
-        else 0
-    )
-
-    print(f"\n📊 SITUAÇÃO ATUAL (TODAS AS APOSTAS):")
-    print(f"   💰 Lucro total: {original_profit:.2f} unidades")
-    print(f"   🎲 Total apostas: {original_bets_count}")
-    print(f"   💹 ROI médio: {original_roi:.2f}%")
-    print(f"   📊 Win rate: {original_wr:.1f}%")
-    print(f"   📈 Lucro/aposta: {original_profit / original_bets_count:.4f}")
-
-    print(f"\n🚀 ESTRATÉGIA OTIMIZADA (APOSTAS APROVADAS):")
-    print(f"   💰 Lucro total: {optimized_profit:.2f} unidades")
-    print(f"   🎲 Total apostas: {optimized_bets_count}")
-    print(f"   💹 ROI médio: {optimized_roi:.2f}%")
-    print(f"   📊 Win rate: {optimized_wr:.1f}%")
-    print(
-        f"   📈 Lucro/aposta: {optimized_profit / optimized_bets_count:.4f}"
-        if optimized_bets_count > 0
-        else "   📈 Lucro/aposta: 0.0000"
-    )
-
-    print(f"\n❌ APOSTAS REJEITADAS (QUE VOCÊ EVITARIA):")
-    print(f"   💰 Lucro total: {rejected_profit:.2f} unidades")
-    print(f"   🎲 Total apostas: {rejected_bets_count}")
-    print(f"   💹 ROI médio: {rejected_roi:.2f}%")
-    print(f"   📊 Win rate: {rejected_wr:.1f}%")
-    print(
-        f"   📈 Lucro/aposta: {rejected_profit / rejected_bets_count:.4f}"
-        if rejected_bets_count > 0
-        else "   📈 Lucro/aposta: 0.0000"
-    )
-
-    # 6. IMPACTO DA OTIMIZAÇÃO
-    print(f"\n" + "=" * 80)
-    print("💎 IMPACTO DA OTIMIZAÇÃO")
-    print("=" * 80)
-
-    if optimized_bets_count > 0:
-        efficiency_gain = optimized_roi - original_roi
-        profit_concentration = (
-            (optimized_profit / original_profit * 100) if original_profit != 0 else 0
-        )
-        volume_reduction = (
-            (original_bets_count - optimized_bets_count) / original_bets_count * 100
-        )
-
-        print(f"\n🎯 GANHOS DE EFICIÊNCIA:")
-        print(
-            f"   📈 Melhoria no ROI: {efficiency_gain:+.2f}% (de {original_roi:.2f}% → {optimized_roi:.2f}%)"
-        )
-        print(
-            f"   💰 Concentração do lucro: {profit_concentration:.1f}% do lucro em {100 - volume_reduction:.1f}% das apostas"
-        )
-        print(f"   📉 Redução no volume: {volume_reduction:.1f}% menos apostas")
-        print(
-            f"   🎲 Eficiência: {optimized_profit / optimized_profit:.2f}x mais lucro por aposta"
-            if optimized_profit > 0
-            else "   🎲 Eficiência: N/A"
-        )
-
-        # Projeção para mesmo volume
-        if optimized_bets_count > 0:
-            projected_profit_same_volume = (
-                optimized_profit / optimized_bets_count
-            ) * original_bets_count
-            profit_potential = projected_profit_same_volume - original_profit
-
-            print(f"\n💰 POTENCIAL SE APLICASSE A ESTRATÉGIA NO MESMO VOLUME:")
-            print(f"   🎯 Lucro projetado: {projected_profit_same_volume:.2f} unidades")
-            print(f"   📈 Ganho potencial: +{profit_potential:.2f} unidades")
-            print(
-                f"   📊 Melhoria: {(profit_potential / original_profit * 100):+.1f}%"
-                if original_profit > 0
-                else "   📊 Melhoria: +∞%"
-            )
-
-    # 7. ANÁLISE DOS MOTIVOS DE REJEIÇÃO
-    print(f"\n" + "=" * 80)
-    print("🔍 ANÁLISE DOS MOTIVOS DE REJEIÇÃO")
-    print("=" * 80)
-
-    rejection_analysis = (
-        rejected_bets.groupby("strategy_reason")
+        df_filtered.groupby("grouped_market")
         .agg(
             {"profit": ["sum", "count"], "status": lambda x: (x == "win").mean() * 100}
         )
         .round(2)
     )
 
-    rejection_analysis.columns = ["Profit_Lost", "Bets_Count", "Win_Rate"]
-    rejection_analysis["ROI"] = (
-        rejection_analysis["Profit_Lost"] / rejection_analysis["Bets_Count"] * 100
+    market_analysis.columns = ["Total_Profit", "Bets", "Win_Rate"]
+    market_analysis["ROI"] = (
+        market_analysis["Total_Profit"] / market_analysis["Bets"] * 100
     ).round(2)
-    rejection_analysis = rejection_analysis.sort_values("Profit_Lost", ascending=True)
+    market_analysis = market_analysis.sort_values("Total_Profit", ascending=False)
 
-    print(f"\n📊 MOTIVOS DE REJEIÇÃO (DO PIOR PARA O MELHOR):")
-    for reason, stats in rejection_analysis.iterrows():
-        impact = (
-            "💸"
-            if stats["Profit_Lost"] < -1
-            else "📉"
-            if stats["Profit_Lost"] < 0
-            else "📈"
-        )
+    print(f"\n💰 PERFORMANCE POR MERCADO (ORDENADO POR LUCRO):")
+    for mercado, row in market_analysis.iterrows():
+        if row["Total_Profit"] >= 3:
+            icon = "💎"  # Mercados muito lucrativos
+        elif row["Total_Profit"] > 0:
+            icon = "✅"  # Mercados lucrativos
+        else:
+            icon = "❌"  # Mercados com prejuízo
+
+        # Destaque especial para INHIBITORS
+        if "INHIBITOR" in mercado:
+            icon = "🎯"  # Mercado especial INHIBITORS
+
         print(
-            f"   {impact} {reason:<20}: {stats['Profit_Lost']:>7.2f} unidades | {stats['Bets_Count']:>3.0f} apostas | ROI: {stats['ROI']:>5.1f}%"
+            f"{icon} {mercado:<25} 💰 {row['Total_Profit']:>7.2f} | 📈 {row['ROI']:>6.1f}% | "
+            f"🎯 {row['Win_Rate']:>5.1f}% | 🎲 {int(row['Bets'])}"
         )
 
-    # 8. TOP PERFORMERS NA ESTRATÉGIA OTIMIZADA
+    # Análise específica de INHIBITORS
+    inhibitors_data = df_filtered[df_filtered["market_type"] == "INHIBITORS"]
+    if len(inhibitors_data) > 0:
+        inhibitors_profit = inhibitors_data["profit"].sum()
+        inhibitors_count = len(inhibitors_data)
+        inhibitors_roi = inhibitors_profit / inhibitors_count * 100
+        inhibitors_wr = (inhibitors_data["status"] == "win").mean() * 100
+
+        print(f"\n🎯 ANÁLISE ESPECÍFICA DE INHIBITORS:")
+        print(f"   💰 Lucro total: {inhibitors_profit:.2f} unidades")
+        print(f"   🎲 Total de apostas: {inhibitors_count}")
+        print(f"   📈 ROI: {inhibitors_roi:.2f}%")
+        print(f"   🎯 Win Rate: {inhibitors_wr:.1f}%")
+        print(
+            f"   💡 Contribuição para lucro total: {inhibitors_profit / df_filtered['profit'].sum() * 100:.1f}%"
+        )
+
+    # Análise de concentração de lucro
+    profitable_markets_analysis = market_analysis[market_analysis["Total_Profit"] > 0]
+    total_profitable_volume = profitable_markets_analysis["Total_Profit"].sum()
+
+    print(f"\n📊 CONCENTRAÇÃO DE LUCRO POR MERCADO:")
+    for mercado, row in profitable_markets_analysis.head(3).iterrows():
+        percentage = row["Total_Profit"] / total_profitable_volume * 100
+        print(
+            f"   💎 {mercado}: {percentage:.1f}% do lucro total ({row['Total_Profit']:.2f} units)"
+        )
+
+    # ========================================================================
+    # 4. ANÁLISE POR FAIXA DE ODDS (DADOS FILTRADOS) - NOVA CATEGORIZAÇÃO
+    # ========================================================================
     print(f"\n" + "=" * 80)
-    print("🏆 TOP PERFORMERS NA ESTRATÉGIA OTIMIZADA")
+    print("📊 PERFORMANCE POR FAIXA DE ODDS (RANGES ROI FILTRADOS - ODDS AJUSTADAS)")
     print("=" * 80)
 
-    if len(optimized_bets) > 0:
-        optimized_market_analysis = (
-            optimized_bets.groupby("grouped_market")
-            .agg(
-                {
-                    "profit": ["sum", "count", "mean"],
-                    "status": lambda x: (x == "win").sum(),
-                }
-            )
-            .round(4)
+    odds_analysis = (
+        df_filtered.groupby("odds_category")
+        .agg(
+            {"profit": ["sum", "count"], "status": lambda x: (x == "win").mean() * 100}
+        )
+        .round(2)
+    )
+
+    odds_analysis.columns = ["Total_Profit", "Bets", "Win_Rate"]
+    odds_analysis["ROI"] = (
+        odds_analysis["Total_Profit"] / odds_analysis["Bets"] * 100
+    ).round(2)
+    odds_analysis = odds_analysis.sort_values("Total_Profit", ascending=False)
+
+    print(f"\n💰 PERFORMANCE POR FAIXA DE ODDS (ORDENADO POR LUCRO):")
+    for odds_cat, row in odds_analysis.iterrows():
+        if row["Total_Profit"] >= 5:
+            icon = "💎"  # Faixas muito lucrativas
+        elif row["Total_Profit"] > 0:
+            icon = "✅"  # Faixas lucrativas
+        else:
+            icon = "❌"  # Faixas com prejuízo
+
+        print(
+            f"{icon} {odds_cat:<25} 💰 {row['Total_Profit']:>7.2f} | 📈 {row['ROI']:>6.1f}% | "
+            f"🎯 {row['Win_Rate']:>5.1f}% | 🎲 {int(row['Bets'])}"
         )
 
-        optimized_market_analysis.columns = [
-            "Total_Profit",
-            "Total_Bets",
-            "Avg_Profit",
-            "Wins",
-        ]
-        optimized_market_analysis["ROI"] = (
-            optimized_market_analysis["Total_Profit"]
-            / optimized_market_analysis["Total_Bets"]
-            * 100
-        ).round(2)
-        optimized_market_analysis = optimized_market_analysis.sort_values(
-            "Total_Profit", ascending=False
+    # Destacar performance da nova categoria media_alta
+    if "media_alta (2.0~~2.5)" in odds_analysis.index:
+        media_alta_data = odds_analysis.loc["media_alta (2.0~~2.5)"]
+        print(f"\n🆕 NOVA CATEGORIA MEDIA_ALTA (2.0~~2.5):")
+        print(f"   💰 Lucro: {media_alta_data['Total_Profit']:.2f} unidades")
+        print(f"   📈 ROI: {media_alta_data['ROI']:.2f}%")
+        print(f"   🎯 Win Rate: {media_alta_data['Win_Rate']:.1f}%")
+        print(f"   🎲 Apostas: {int(media_alta_data['Bets'])}")
+
+    # Identificar faixas de odds mais lucrativas
+    odds_profit_ranking = odds_analysis.sort_values("Total_Profit", ascending=False)
+    print(f"\n🏆 TOP 3 FAIXAS DE ODDS POR LUCRO:")
+    for i, (odds_cat, row) in enumerate(odds_profit_ranking.head(3).iterrows(), 1):
+        print(
+            f"   {i}. {odds_cat}: {row['Total_Profit']:.2f} units ({row['ROI']:.1f}% ROI)"
         )
 
-        print(f"\n🏆 MERCADOS NA ESTRATÉGIA OTIMIZADA:")
-        for market, stats in optimized_market_analysis.iterrows():
-            print(
-                f"   ✅ {market:<25}: {stats['Total_Profit']:>7.2f} unidades | ROI: {stats['ROI']:>5.1f}% | Apostas: {stats['Total_Bets']:>3.0f}"
-            )
+    # ========================================================================
+    # 5. ANÁLISE POR DIREÇÃO (DADOS FILTRADOS)
+    # ========================================================================
+    direction_analysis = (
+        df_filtered.groupby("direction")
+        .agg(
+            {"profit": ["sum", "count"], "status": lambda x: (x == "win").mean() * 100}
+        )
+        .round(2)
+    )
 
-    # 9. RECOMENDAÇÕES FINAIS
+    direction_analysis.columns = ["Total_Profit", "Bets", "Win_Rate"]
+    direction_analysis["ROI"] = (
+        direction_analysis["Total_Profit"] / direction_analysis["Bets"] * 100
+    ).round(2)
+
+    print(f"\n🔽 PERFORMANCE UNDER vs OVER (RANGES ROI FILTRADOS - COM INHIBITORS):")
+    for direction, row in direction_analysis.iterrows():
+        icon = "✅" if row["Total_Profit"] > 0 else "❌"
+        print(
+            f"{icon} {direction:<5} Lucro: {row['Total_Profit']:>7.2f} | ROI: {row['ROI']:>6.1f}% | "
+            f"Win Rate: {row['Win_Rate']:>5.1f}% | Apostas: {int(row['Bets'])}"
+        )
+
+    # ========================================================================
+    # 6. DEFINIÇÃO DOS CRITÉRIOS DA ESTRATÉGIA OTIMIZADA
+    # ========================================================================
     print(f"\n" + "=" * 80)
-    print("💡 RECOMENDAÇÕES ESTRATÉGICAS FINAIS")
+    print("🎯 DEFININDO ESTRATÉGIA OTIMIZADA")
     print("=" * 80)
 
-    print(f"\n🎯 RESUMO EXECUTIVO:")
-    print(
-        f"   💰 Lucro atual: {original_profit:.2f} unidades com {original_bets_count} apostas"
-    )
-    print(
-        f"   🚀 Lucro otimizado: {optimized_profit:.2f} unidades com {optimized_bets_count} apostas"
-    )
-    print(f"   📈 Eficiência: {optimized_roi:.2f}% ROI vs {original_roi:.2f}% atual")
+    # Critérios baseados em LUCRO REAL, não em precisão estatística
+    profitable_markets = market_analysis[
+        (market_analysis["Total_Profit"] > 1)  # Lucro mínimo de 1 unidade
+        & (market_analysis["ROI"] > 5)  # ROI mínimo de 5%
+        & (market_analysis["Bets"] >= 3)  # Volume mínimo
+    ].index.tolist()
 
-    if optimized_bets_count > 0 and optimized_roi > original_roi:
-        print(f"\n✅ ESTRATÉGIA COMPROVADAMENTE SUPERIOR!")
-        print(f"   🎯 Aplique os filtros da estratégia otimizada")
-        print(f"   📈 Ganhe {efficiency_gain:.2f}% mais por aposta")
-        print(
-            f"   💰 Potencial de {profit_potential:.2f} unidades extras"
-            if "profit_potential" in locals()
-            else ""
+    profitable_odds = odds_analysis[
+        (odds_analysis["Total_Profit"] > 0)  # Qualquer lucro positivo
+        & (odds_analysis["ROI"] > 0)  # ROI positivo
+    ].index.tolist()
+
+    profitable_directions = direction_analysis[
+        direction_analysis["Total_Profit"] > 1  # Lucro mínimo de 1 unidade
+    ].index.tolist()
+
+    print(f"\n💎 CRITÉRIOS DA ESTRATÉGIA OTIMIZADA (BASEADO EM LUCRO REAL):")
+    print(f"   💰 Ranges ROI lucrativos: {best_est_roi_categories}")
+    print(f"   🏆 Mercados mais lucrativos: {profitable_markets}")
+    print(f"   📊 Faixas de odds lucrativas: {profitable_odds}")
+    print(f"   🎯 Direções mais lucrativas: {profitable_directions}")
+
+    # Verificar se INHIBITORS está nos mercados lucrativos
+    inhibitors_in_strategy = any("INHIBITOR" in market for market in profitable_markets)
+    print(
+        f"\n🎯 INHIBITORS na estratégia: {'✅ SIM' if inhibitors_in_strategy else '❌ NÃO'}"
+    )
+
+    # Mostrar potencial de lucro dos critérios selecionados
+    selected_market_profit = (
+        market_analysis.loc[profitable_markets, "Total_Profit"].sum()
+        if profitable_markets
+        else 0
+    )
+    selected_odds_profit = (
+        odds_analysis.loc[profitable_odds, "Total_Profit"].sum()
+        if profitable_odds
+        else 0
+    )
+
+    print(f"\n📈 POTENCIAL DOS CRITÉRIOS SELECIONADOS:")
+    print(f"   💰 Lucro dos mercados selecionados: {selected_market_profit:.2f} units")
+    print(f"   📊 Lucro das odds selecionadas: {selected_odds_profit:.2f} units")
+
+    # ========================================================================
+    # 7. APLICAR ESTRATÉGIA OTIMIZADA (BACKTEST)
+    # ========================================================================
+    print(f"\n" + "=" * 80)
+    print("🚀 BACKTEST DA ESTRATÉGIA OTIMIZADA")
+    print("=" * 80)
+
+    def apply_optimized_strategy(row):
+        return (
+            row["est_roi_category"] in best_est_roi_categories
+            and row["grouped_market"] in profitable_markets
+            and row["odds_category"] in profitable_odds
+            and row["direction"] in profitable_directions
         )
-    else:
-        print(f"\n⚠️ ESTRATÉGIA PRECISA DE AJUSTES")
-        print(f"   🔍 Analise mercados individuais")
-        print(f"   📊 Considere critérios menos restritivos")
 
-    print(f"\n🚀 PRÓXIMOS PASSOS:")
-    print(f"   1. 🎯 Implemente os filtros da estratégia otimizada")
-    print(f"   2. 📊 Monitore performance com novos dados")
-    print(f"   3. 🔄 Ajuste critérios conforme necessário")
-    print(f"   4. 📈 Foque no ROI, não apenas no volume")
+    # Aplicar apenas nos dados já filtrados por ROI
+    df_filtered["strategy_approved"] = df_filtered.apply(
+        apply_optimized_strategy, axis=1
+    )
 
+    optimized_bets = df_filtered[df_filtered["strategy_approved"]]
+    rejected_bets = df_filtered[~df_filtered["strategy_approved"]]
+
+    # Métricas do backtest
+    opt_profit = optimized_bets["profit"].sum()
+    opt_count = len(optimized_bets)
+    opt_roi = (opt_profit / opt_count * 100) if opt_count > 0 else 0
+    opt_wr = (optimized_bets["status"] == "win").mean() * 100 if opt_count > 0 else 0
+
+    rej_profit = rejected_bets["profit"].sum()
+    rej_count = len(rejected_bets)
+    rej_roi = (rej_profit / rej_count * 100) if rej_count > 0 else 0
+
+    print(f"\n📊 RESULTADOS DO BACKTEST:")
+    print(f"   📈 Apostas no filtro ROI: {len(df_filtered)}")
+    print(f"   ✅ Apostas aprovadas pela estratégia: {opt_count}")
+    print(f"   ❌ Apostas rejeitadas: {rej_count}")
+    print(f"   📊 Taxa de aprovação final: {opt_count / len(df_filtered) * 100:.1f}%")
+
+    # Verificar quantas apostas INHIBITORS foram aprovadas
+    optimized_inhibitors = optimized_bets[optimized_bets["market_type"] == "INHIBITORS"]
+    print(f"   🎯 Apostas INHIBITORS aprovadas: {len(optimized_inhibitors)}")
+    if len(optimized_inhibitors) > 0:
+        inhibitors_contribution = optimized_inhibitors["profit"].sum()
+        print(
+            f"   💰 Contribuição INHIBITORS: {inhibitors_contribution:.2f} units ({inhibitors_contribution / opt_profit * 100:.1f}%)"
+        )
+
+    # ========================================================================
+    # 8. COMPARAÇÃO DETALHADA
+    # ========================================================================
+    print(f"\n" + "=" * 80)
+    print("📊 COMPARAÇÃO: TODAS vs RANGES ROI vs ESTRATÉGIA FINAL (COM INHIBITORS)")
+    print("=" * 80)
+
+    print(f"\n📊 TODAS AS APOSTAS:")
+    print(f"   💰 Lucro: {profit_total:.2f} unidades")
+    print(f"   🎲 Apostas: {total}")
+    print(f"   💹 ROI: {roi_avg:.2f}%")
+    print(f"   📊 Win Rate: {win_rate:.1f}%")
+
+    filtered_profit = df_filtered["profit"].sum()
+    filtered_roi = (
+        (filtered_profit / len(df_filtered) * 100) if len(df_filtered) > 0 else 0
+    )
+    filtered_wr = (
+        (df_filtered["status"] == "win").mean() * 100 if len(df_filtered) > 0 else 0
+    )
+
+    print(f"\n📈 APENAS RANGES ROI LUCRATIVOS:")
+    print(f"   💰 Lucro: {filtered_profit:.2f} unidades")
+    print(f"   🎲 Apostas: {len(df_filtered)}")
+    print(f"   💹 ROI: {filtered_roi:.2f}%")
+    print(f"   📊 Win Rate: {filtered_wr:.1f}%")
+
+    print(f"\n🚀 ESTRATÉGIA FINAL OTIMIZADA:")
+    print(f"   💰 Lucro: {opt_profit:.2f} unidades")
+    print(f"   🎲 Apostas: {opt_count}")
+    print(f"   💹 ROI: {opt_roi:.2f}%")
+    print(f"   📊 Win Rate: {opt_wr:.1f}%")
+
+    if rej_count > 0:
+        print(f"\n❌ APOSTAS REJEITADAS (DENTRO DOS RANGES ROI):")
+        print(f"   💰 Lucro evitado: {rej_profit:.2f} unidades")
+        print(f"   🎲 Apostas: {rej_count}")
+        print(f"   💹 ROI rejeitado: {rej_roi:.2f}%")
+
+    # ========================================================================
+    # 9. IMPACTO DA OTIMIZAÇÃO
+    # ========================================================================
+    print(f"\n" + "=" * 80)
+    print("💎 IMPACTO FINANCEIRO DA OTIMIZAÇÃO (COM INHIBITORS)")
+    print("=" * 80)
+
+    if opt_count > 0:
+        # Comparação financeira com todas as apostas
+        roi_improvement_all = opt_roi - roi_avg
+        profit_multiplication = opt_profit / profit_total if profit_total > 0 else 0
+        volume_reduction_all = (total - opt_count) / total * 100
+        profit_per_bet_improvement = (
+            (opt_profit / opt_count) / (profit_total / total) if total > 0 else 0
+        )
+
+        print(f"\n💰 GANHOS FINANCEIROS vs TODAS AS APOSTAS:")
+        print(
+            f"   📈 Multiplicação do ROI: {opt_roi / roi_avg:.1f}x ({roi_avg:.2f}% → {opt_roi:.2f}%)"
+        )
+        print(
+            f"   💎 Multiplicação do lucro: {profit_multiplication:.1f}x ({profit_total:.2f} → {opt_profit:.2f} units)"
+        )
+        print(f"   🎯 Eficiência por aposta: {profit_per_bet_improvement:.1f}x melhor")
+        print(f"   📉 Redução de volume: {volume_reduction_all:.1f}% (mais seletivo)")
+
+        # Comparação apenas com ranges ROI
+        roi_improvement_filtered = opt_roi - filtered_roi
+        profit_concentration_filtered = (
+            (opt_profit / filtered_profit * 100) if filtered_profit != 0 else 0
+        )
+
+        print(f"\n🔍 REFINAMENTO ADICIONAL vs RANGES ROI:")
+        print(f"   📈 Ganho ROI adicional: {roi_improvement_filtered:+.2f}%")
+        print(f"   💰 Concentração de lucro: {profit_concentration_filtered:.1f}%")
+
+        # Projeção de lucro futuro
+        if opt_count > 0:
+            monthly_projection = (
+                opt_profit / opt_count
+            ) * 30  # Assumindo ~1 aposta/dia
+
+            print(f"\n🚀 PROJEÇÃO DE LUCRO (30 apostas/mês):")
+            print(f"   💰 Lucro esperado mensal: {monthly_projection:.2f} units")
+            print(f"   📊 ROI esperado: {opt_roi:.2f}% por aposta")
+
+    # ========================================================================
+    # 10. RECOMENDAÇÕES FINAIS
+    # ========================================================================
+    print(f"\n" + "=" * 80)
+    print("💡 RECOMENDAÇÕES ESTRATÉGICAS FINAIS (COM INHIBITORS)")
+    print("=" * 80)
+
+    print(f"\n💰 RESUMO EXECUTIVO (COM INHIBITORS - FOCADO EM LUCRO):")
+    print(f"   🏆 Ranges mais lucrativos: {best_est_roi_categories}")
+    print(
+        f"   💎 Top 3 mercados: {profitable_markets[:3] if len(profitable_markets) >= 3 else profitable_markets}"
+    )
+    print(f"   📈 ROI final da estratégia: {opt_roi:.2f}%")
+    print(
+        f"   💰 Lucro por aposta otimizada: {(opt_profit / opt_count):.4f} units"
+        if opt_count > 0
+        else "   💰 Lucro por aposta: N/A"
+    )
+    print(
+        f"   🎯 INHIBITORS incluídos: {'✅ SIM' if inhibitors_in_strategy else '❌ NÃO'}"
+    )
+
+    print(f"\n🚀 PLANO DE AÇÃO COM INHIBITORS:")
+    print(f"   1. 💎 FOCO TOTAL nos ranges de ROI identificados")
+    print(f"   2. 🎯 APROVEITAR mercados INHIBITORS quando disponíveis")
+    print(f"   3. 📊 MONITORAR nova categoria media_alta (2.0~~2.5)")
+    print(f"   4. 🔍 MANTER disciplina nos critérios de seleção")
+    print(f"   5. 💰 REAVALIAR estratégia a cada 50 apostas")
+
+    # Recomendações específicas baseadas nos dados
+    if len(profitable_markets) > 0:
+        top_market = profitable_markets[0]
+        print(f"\n💡 ESTRATÉGIA PRIORITÁRIA:")
+        print(f"   🥇 FOCO PRINCIPAL em: {top_market}")
+        print(f"   📈 Aumentar volume nos mercados TOP 3")
+        print(f"   🎯 Manter disciplina nos ranges de ROI")
+        print(f"   🔄 Monitorar performance das novas odds")
+
+    # Retorno dos resultados
     return {
-        "original_data": original_bets,
+        "original_data": df,  # Dataset COMPLETO com INHIBITORS
+        "filtered_data": df_filtered,
         "optimized_bets": optimized_bets,
         "rejected_bets": rejected_bets,
+        "roi_est_analysis": roi_est_analysis,
         "market_analysis": market_analysis,
         "odds_analysis": odds_analysis,
         "strategy_criteria": {
-            "profitable_markets": profitable_markets,
-            "profitable_odds": profitable_odds,
-            "profitable_direction": profitable_direction,
+            "est_roi_ranges": best_est_roi_categories,
+            "markets": profitable_markets,
+            "odds": profitable_odds,
+            "directions": profitable_directions,
         },
         "performance_metrics": {
-            "original": {
-                "profit": original_profit,
-                "bets": original_bets_count,
-                "roi": original_roi,
+            "all_bets_with_inhibitors": {
+                "profit": profit_total,
+                "count": total,
+                "roi": roi_avg,
             },
-            "optimized": {
-                "profit": optimized_profit,
-                "bets": optimized_bets_count,
-                "roi": optimized_roi,
+            "filtered_by_roi_ranges": {
+                "profit": filtered_profit,
+                "count": len(df_filtered),
+                "roi": filtered_roi,
             },
-            "rejected": {
-                "profit": rejected_profit,
-                "bets": rejected_bets_count,
-                "roi": rejected_roi,
+            "optimized_bets": {
+                "profit": opt_profit,
+                "count": opt_count,
+                "roi": opt_roi,
             },
         },
+        "inhibitors_included": True,
+        "new_odds_categories": True,
     }
 
 
-# Executar análise completa
+# Execução direta
 if __name__ == "__main__":
-    file_path = "../bets/bets_atualizadas_por_mapa.csv"
+    file_path = (
+        "../bets/bets_atualizadas_por_mapa.csv"  # Ajuste o caminho conforme necessário
+    )
     results = complete_betting_analysis_with_backtest(file_path)
 
-    print("\n" + "=" * 80)
-    print("✅ ANÁLISE COMPLETA FINALIZADA!")
+    print(f"\n" + "=" * 80)
+    print("✅ ANÁLISE COM INHIBITORS E ODDS AJUSTADAS FINALIZADA!")
+    print("🎯 Estratégia completa com todos os mercados disponíveis")
+    print("🆕 Nova categoria de odds media_alta (2.0~~2.5) incluída")
     print("=" * 80)
-    print("\n📋 Dados disponíveis em 'results':")
-    print("   - results['original_data']: Todas as apostas originais")
-    print("   - results['optimized_bets']: Apostas aprovadas pela estratégia")
-    print("   - results['rejected_bets']: Apostas rejeitadas")
-    print("   - results['strategy_criteria']: Critérios da estratégia otimizada")
-    print("   - results['performance_metrics']: Métricas comparativas")
