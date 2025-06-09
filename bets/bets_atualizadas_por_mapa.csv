@@ -206,6 +206,10 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 1 Jun 2025 13:00,LTA S,Vivo Keyd Stars,RED Canids,under,game_duration 33.5,29.35,22.00%,1.5,1.83,BET365,url não disponível,win,,0.83,2
 1 Jun 2025 13:00,LTA S,Vivo Keyd Stars,RED Canids,under,game_duration 33.5,36.98,22.00%,1.5,1.83,BET365,url não disponível,loss,,-1.0,3
 1 Jun 2025 13:00,LTA S,Vivo Keyd Stars,RED Canids,under,game_duration 33.5,27.02,22.00%,1.5,1.83,BET365,url não disponível,win,,0.83,4
+8 Jun 2025 13:00,LTA S,paiN Gaming,FURIA,under,total_towers 12.5,14.0,12.11%,1.4,1.57,BET365,url não disponível,loss,,-1.0,1
+8 Jun 2025 13:00,LTA S,paiN Gaming,FURIA,under,total_towers 12.5,12.0,12.11%,1.4,1.57,BET365,url não disponível,win,,0.57,2
+8 Jun 2025 13:00,LTA S,paiN Gaming,FURIA,under,total_towers 12.5,18.0,12.11%,1.4,1.57,BET365,url não disponível,loss,,-1.0,3
+8 Jun 2025 13:00,LTA S,paiN Gaming,FURIA,under,total_towers 12.5,10.0,12.11%,1.4,1.57,BET365,url não disponível,win,,0.57,4
 27 Mai 2025 10:00,VCS,Saigon Dino,Mila Gaming,over,total_dragons 4.5,4.0,10.27%,2.15,2.37,BET365,url não disponível,loss,,-1.0,1
 27 Mai 2025 10:00,VCS,Saigon Dino,Mila Gaming,under,total_inhibitors 1.5,2.0,18.75%,1.6,1.9,BET365,url não disponível,loss,,-1.0,1
 27 Mai 2025 07:00,VCS,Saigon Secret,GenZ Gaming,over,total_dragons 4.5,3.0,13.03%,1.62,1.83,BET365,url não disponível,loss,,-1.0,1
@@ -368,8 +372,12 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 4 Jun 2025 05:00,LCK,Dplus KIA,KT Rolster,under,game_duration 32.5,35.43,32.67%,1.38,1.83,BET365,url não disponível,loss,,-1.0,2
 4 Jun 2025 05:00,LCK,Dplus KIA,KT Rolster,under,game_duration 32.5,35.5,32.67%,1.38,1.83,BET365,url não disponível,loss,,-1.0,3
 4 Jun 2025 06:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_kills 32.5,31.0,37.25%,1.33,1.83,BET365,url não disponível,win,,0.83,1
+4 Jun 2025 06:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_kills 32.5,31.0,37.25%,1.33,1.83,BET365,url não disponível,win,,0.83,1
+4 Jun 2025 06:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_kills 32.5,42.0,37.25%,1.33,1.83,BET365,url não disponível,loss,,-1.0,2
 4 Jun 2025 06:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_kills 32.5,42.0,37.25%,1.33,1.83,BET365,url não disponível,loss,,-1.0,2
 4 Jun 2025 06:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_kills 32.5,28.0,37.25%,1.33,1.83,BET365,url não disponível,win,,0.83,3
+4 Jun 2025 06:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_kills 32.5,28.0,37.25%,1.33,1.83,BET365,url não disponível,win,,0.83,3
+4 Jun 2025 06:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_kills 32.5,36.0,37.25%,1.33,1.83,BET365,url não disponível,loss,,-1.0,4
 4 Jun 2025 06:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_kills 32.5,36.0,37.25%,1.33,1.83,BET365,url não disponível,loss,,-1.0,4
 4 Jun 2025 06:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_kills 32.5,27.0,37.25%,1.33,1.83,BET365,url não disponível,win,,0.83,5
 5 Jun 2025 06:00,LPL,Team WE,JD Gaming,under,total_dragons 4.5,4.0,12.50%,1.6,1.8,BET365,url não disponível,win,,0.8,1
@@ -422,6 +430,16 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 7 Jun 2025 13:00,LTA S,Vivo Keyd Stars,Isurus Estral,under,total_inhibitors 1.5,1.0,41.90%,1.21,1.72,BET365,url não disponível,win,,0.72,3
 7 Jun 2025 05:00,LCK,KT Rolster,Dplus KIA,under,total_towers 12.5,16.0,13.82%,1.38,1.57,BET365,url não disponível,loss,,-1.0,1
 7 Jun 2025 05:00,LCK,KT Rolster,Dplus KIA,under,game_duration 33.5,38.25,14.38%,1.6,1.83,BET365,url não disponível,loss,,-1.0,1
+8 Jun 2025 06:00,LPL,Top Esports,Team WE,under,total_dragons 4.5,3.0,11.80%,1.54,1.72,BET365,url não disponível,win,,0.72,1
+8 Jun 2025 06:00,LPL,Top Esports,Team WE,under,total_dragons 4.5,4.0,11.80%,1.54,1.72,BET365,url não disponível,win,,0.72,2
+8 Jun 2025 06:00,LPL,Top Esports,Team WE,under,total_dragons 4.5,5.0,11.80%,1.54,1.72,BET365,url não disponível,loss,,-1.0,3
+8 Jun 2025 06:00,LPL,Top Esports,Team WE,under,total_dragons 4.5,4.0,11.80%,1.54,1.72,BET365,url não disponível,win,,0.72,4
+8 Jun 2025 06:00,LPL,Top Esports,Team WE,under,total_dragons 4.5,4.0,11.80%,1.54,1.72,BET365,url não disponível,win,,0.72,5
+8 Jun 2025 06:00,LPL,Top Esports,Team WE,under,game_duration 32.5,27.88,32.67%,1.38,1.83,BET365,url não disponível,win,,0.83,1
+8 Jun 2025 06:00,LPL,Top Esports,Team WE,under,game_duration 32.5,26.03,32.67%,1.38,1.83,BET365,url não disponível,win,,0.83,2
+8 Jun 2025 06:00,LPL,Top Esports,Team WE,under,game_duration 32.5,31.28,32.67%,1.38,1.83,BET365,url não disponível,win,,0.83,3
+8 Jun 2025 06:00,LPL,Top Esports,Team WE,under,game_duration 32.5,29.47,32.67%,1.38,1.83,BET365,url não disponível,win,,0.83,4
+8 Jun 2025 06:00,LPL,Top Esports,Team WE,under,game_duration 32.5,29.18,32.67%,1.38,1.83,BET365,url não disponível,win,,0.83,5
 7 Jun 2025 06:30,LCP,TALON,GAM Esports,under,total_inhibitors 1.5,3.0,20.00%,1.67,2.0,BET365,url não disponível,loss,,-1.0,1
 7 Jun 2025 06:30,LCP,TALON,GAM Esports,under,total_inhibitors 1.5,3.0,20.00%,1.67,2.0,BET365,url não disponível,loss,,-1.0,2
 7 Jun 2025 06:30,LCP,TALON,GAM Esports,under,total_inhibitors 1.5,2.0,20.00%,1.67,2.0,BET365,url não disponível,loss,,-1.0,3
@@ -441,3 +459,5 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 8 Jun 2025 06:30,LCP,CTBC Flying Oyster,GAM Esports,under,total_barons 1.5,1.0,12.00%,1.14,1.28,BET365,url não disponível,win,,0.28,1
 8 Jun 2025 06:30,LCP,CTBC Flying Oyster,GAM Esports,under,total_barons 1.5,2.0,12.00%,1.14,1.28,BET365,url não disponível,loss,,-1.0,2
 8 Jun 2025 06:30,LCP,CTBC Flying Oyster,GAM Esports,under,total_barons 1.5,1.0,12.00%,1.14,1.28,BET365,url não disponível,win,,0.28,3
+8 Jun 2025 06:30,LCP,CTBC Flying Oyster,GAM Esports,under,total_barons 1.5,1.0,12.00%,1.14,1.28,BET365,url não disponível,win,,0.28,4
+8 Jun 2025 06:30,LCP,CTBC Flying Oyster,GAM Esports,under,total_barons 1.5,0.0,12.00%,1.14,1.28,BET365,url não disponível,win,,0.28,5
