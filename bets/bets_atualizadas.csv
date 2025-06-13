@@ -105,8 +105,8 @@ date,league,t1,t2,bet_type,bet_line,ROI,fair_odds,odds,House,url,status,telegram
 30 Mai 2025 09:00,LCP,GAM Esports,MGN Vikings Esports,under,total_barons 1.5,17.65%,1.06,1.25,BET365,url não disponível,loss,1,0,0.0
 4 Jun 2025 10:00,LJL,QT DIG∞,Burning Core Toyama,under,total_kills 34.5,27.89%,1.43,1.83,BET365,url não disponível,win,1,0,0.0
 4 Jun 2025 10:00,VCS,Mila Gaming,GenZ Gaming,over,total_kills 35.5,23.53%,1.48,1.83,BET365,url não disponível,win,1,0,0.0
-13 Jun 2025 05:00,LCK,Gen.G,Hanwha Life Esports,under,total_inhibitors 1.5,28.65%,1.29,1.66,BET365,url não disponível,pending,1,0,0.0
-13 Jun 2025 05:00,LCK,Gen.G,Hanwha Life Esports,under,total_towers 12.5,16.25%,1.29,1.5,BET365,url não disponível,pending,1,0,0.0
+13 Jun 2025 05:00,LCK,Gen.G,Hanwha Life Esports,under,total_inhibitors 1.5,28.65%,1.29,1.66,BET365,url não disponível,loss,1,0,0.0
+13 Jun 2025 05:00,LCK,Gen.G,Hanwha Life Esports,under,total_towers 12.5,16.25%,1.29,1.5,BET365,url não disponível,loss,1,0,0.0
 1 Jun 2025 03:00,LCK,Hanwha Life Esports,BNK FEARX,under,total_inhibitors 1.5,32.67%,1.38,1.83,BET365,url não disponível,win,1,0,0.0
 1 Jun 2025 03:00,LCK,Hanwha Life Esports,BNK FEARX,over,total_dragons 4.5,18.13%,1.9,2.25,BET365,url não disponível,loss,1,0,0.0
 31 Mai 2025 06:30,LCP,CTBC Flying Oyster,GAM Esports,under,total_barons 1.5,11.00%,1.08,1.2,BET365,url não disponível,win,1,0,0.0
@@ -159,8 +159,10 @@ date,league,t1,t2,bet_type,bet_line,ROI,fair_odds,odds,House,url,status,telegram
 14 Jun 2025 13:00,LTA S,FURIA,Isurus Estral,under,total_towers 12.5,10.67%,1.5,1.66,BET365,url não disponível,pending,1,0,0.0
 12 Jun 2025 12:00,NLC,NORD Esports,Los Ratones,over,total_inhibitors 1.5,22.30%,1.47,1.8,BET365,url não disponível,pending,1,0,0.0
 12 Jun 2025 12:00,NLC,NORD Esports,Los Ratones,over,total_towers 12.5,19.71%,1.5,1.8,BET365,url não disponível,pending,1,0,0.0
-13 Jun 2025 06:00,LPL,Bilibili Gaming,Invictus Gaming,under,total_dragons 4.5,40.62%,1.6,2.25,BET365,url não disponível,pending,1,0,0.0
-13 Jun 2025 06:00,LPL,Bilibili Gaming,Invictus Gaming,under,game_duration 32.5,23.53%,1.48,1.83,BET365,url não disponível,pending,1,0,0.0
+13 Jun 2025 06:00,LPL,Bilibili Gaming,Invictus Gaming,under,total_dragons 4.5,40.62%,1.6,2.25,BET365,url não disponível,win,1,0,0.0
+13 Jun 2025 06:00,LPL,Bilibili Gaming,Invictus Gaming,under,game_duration 32.5,23.53%,1.48,1.83,BET365,url não disponível,loss,1,0,0.0
 13 Jun 2025 12:00,LFL,Karmine Corp Blue,Zero Tenacity,over,total_dragons 4.5,14.55%,2.07,2.37,BET365,url não disponível,pending,1,0,0.0
 14 Jun 2025 12:00,LEC,GiantX,Gentle Mates,under,total_towers 12.5,23.53%,1.62,2.0,BET365,url não disponível,pending,1,0,0.0
 14 Jun 2025 12:00,LEC,GiantX,Gentle Mates,under,total_kills 28.5,13.03%,1.62,1.83,BET365,url não disponível,pending,1,0,0.0
+16 Jun 2025 12:00,NLC,Los Ratones,BoostGate Esports,over,total_kills 29.5,14.38%,1.6,1.83,BET365,url não disponível,pending,1,0,0.0
+16 Jun 2025 12:00,TCL,Misa Esports,BK ROG Esports,under,game_duration 32.5,22.00%,1.5,1.83,BET365,url não disponível,pending,1,0,0.0
