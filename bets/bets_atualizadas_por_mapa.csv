@@ -320,10 +320,12 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 13 Jun 2025 05:00,LCK,Gen.G,Hanwha Life Esports,under,total_towers 12.5,10.0,16.25%,1.29,1.5,BET365,url não disponível,win,,0.5,2
 13 Jun 2025 05:00,LCK,Gen.G,Hanwha Life Esports,under,total_towers 12.5,10.0,16.25%,1.29,1.5,BET365,url não disponível,win,,0.5,3
 13 Jun 2025 05:00,LCK,Gen.G,Hanwha Life Esports,under,total_towers 12.5,9.0,16.25%,1.29,1.5,BET365,url não disponível,win,,0.5,4
+13 Jun 2025 05:00,LCK,Gen.G,Hanwha Life Esports,under,total_towers 12.5,11.0,16.25%,1.29,1.5,BET365,url não disponível,win,,0.5,5
 13 Jun 2025 05:00,LCK,Gen.G,Hanwha Life Esports,under,total_inhibitors 1.5,3.0,28.65%,1.29,1.66,BET365,url não disponível,loss,,-1.0,1
 13 Jun 2025 05:00,LCK,Gen.G,Hanwha Life Esports,under,total_inhibitors 1.5,1.0,28.65%,1.29,1.66,BET365,url não disponível,win,,0.66,2
 13 Jun 2025 05:00,LCK,Gen.G,Hanwha Life Esports,under,total_inhibitors 1.5,1.0,28.65%,1.29,1.66,BET365,url não disponível,win,,0.66,3
 13 Jun 2025 05:00,LCK,Gen.G,Hanwha Life Esports,under,total_inhibitors 1.5,1.0,28.65%,1.29,1.66,BET365,url não disponível,win,,0.66,4
+13 Jun 2025 05:00,LCK,Gen.G,Hanwha Life Esports,under,total_inhibitors 1.5,2.0,28.65%,1.29,1.66,BET365,url não disponível,loss,,-1.0,5
 30 Mai 2025 09:00,LCP,GAM Esports,MGN Vikings Esports,under,game_duration 32.5,44.35,18.41%,1.55,1.83,BET365,url não disponível,loss,,-1.0,1
 30 Mai 2025 09:00,LCP,GAM Esports,MGN Vikings Esports,under,game_duration 32.5,45.07,18.41%,1.55,1.83,BET365,url não disponível,loss,,-1.0,2
 30 Mai 2025 09:00,LCP,GAM Esports,MGN Vikings Esports,under,game_duration 32.5,40.0,18.41%,1.55,1.83,BET365,url não disponível,loss,,-1.0,3
@@ -469,6 +471,20 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 8 Jun 2025 06:30,LCP,CTBC Flying Oyster,GAM Esports,under,total_barons 1.5,1.0,12.00%,1.14,1.28,BET365,url não disponível,win,,0.28,3
 8 Jun 2025 06:30,LCP,CTBC Flying Oyster,GAM Esports,under,total_barons 1.5,1.0,12.00%,1.14,1.28,BET365,url não disponível,win,,0.28,4
 8 Jun 2025 06:30,LCP,CTBC Flying Oyster,GAM Esports,under,total_barons 1.5,0.0,12.00%,1.14,1.28,BET365,url não disponível,win,,0.28,5
+11 Jun 2025 06:00,LPL,Invictus Gaming,Team WE,under,total_dragons 4.5,6.0,11.80%,1.54,1.72,BET365,url não disponível,loss,,-1.0,1
+11 Jun 2025 06:00,LPL,Invictus Gaming,Team WE,under,total_dragons 4.5,4.0,11.80%,1.54,1.72,BET365,url não disponível,win,,0.72,2
+11 Jun 2025 06:00,LPL,Invictus Gaming,Team WE,under,total_dragons 4.5,5.0,11.80%,1.54,1.72,BET365,url não disponível,loss,,-1.0,3
+11 Jun 2025 06:00,LPL,Invictus Gaming,Team WE,under,game_duration 32.5,44.33,14.38%,1.6,1.83,BET365,url não disponível,loss,,-1.0,1
+11 Jun 2025 06:00,LPL,Invictus Gaming,Team WE,under,game_duration 32.5,26.67,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,2
+11 Jun 2025 06:00,LPL,Invictus Gaming,Team WE,under,game_duration 32.5,32.58,14.38%,1.6,1.83,BET365,url não disponível,loss,,-1.0,3
+14 Jun 2025 13:00,LTA S,FURIA,Isurus Estral,under,total_towers 12.5,15.0,10.67%,1.5,1.66,BET365,url não disponível,loss,,-1.0,1
+14 Jun 2025 13:00,LTA S,FURIA,Isurus Estral,under,total_towers 12.5,13.0,10.67%,1.5,1.66,BET365,url não disponível,loss,,-1.0,2
+14 Jun 2025 13:00,LTA S,FURIA,Isurus Estral,under,total_towers 12.5,10.0,10.67%,1.5,1.66,BET365,url não disponível,win,,0.66,3
+14 Jun 2025 13:00,LTA S,FURIA,Isurus Estral,under,total_towers 12.5,11.0,10.67%,1.5,1.66,BET365,url não disponível,win,,0.66,4
+14 Jun 2025 13:00,LTA S,FURIA,Isurus Estral,under,total_inhibitors 1.5,1.0,32.00%,1.67,2.2,BET365,url não disponível,win,,1.2,1
+14 Jun 2025 13:00,LTA S,FURIA,Isurus Estral,under,total_inhibitors 1.5,1.0,32.00%,1.67,2.2,BET365,url não disponível,win,,1.2,2
+14 Jun 2025 13:00,LTA S,FURIA,Isurus Estral,under,total_inhibitors 1.5,1.0,32.00%,1.67,2.2,BET365,url não disponível,win,,1.2,3
+14 Jun 2025 13:00,LTA S,FURIA,Isurus Estral,under,total_inhibitors 1.5,2.0,32.00%,1.67,2.2,BET365,url não disponível,loss,,-1.0,4
 13 Jun 2025 06:00,LPL,Bilibili Gaming,Invictus Gaming,under,total_dragons 4.5,4.0,40.62%,1.6,2.25,BET365,url não disponível,win,,1.25,1
 13 Jun 2025 06:00,LPL,Bilibili Gaming,Invictus Gaming,under,total_dragons 4.5,5.0,40.62%,1.6,2.25,BET365,url não disponível,loss,,-1.0,2
 13 Jun 2025 06:00,LPL,Bilibili Gaming,Invictus Gaming,under,total_dragons 4.5,4.0,40.62%,1.6,2.25,BET365,url não disponível,win,,1.25,3
@@ -481,3 +497,15 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 13 Jun 2025 06:00,LPL,Bilibili Gaming,Invictus Gaming,under,total_barons 1.5,2.0,12.00%,1.25,1.4,BET365,url não disponível,loss,,-1.0,2
 13 Jun 2025 06:00,LPL,Bilibili Gaming,Invictus Gaming,under,total_barons 1.5,1.0,12.00%,1.25,1.4,BET365,url não disponível,win,,0.4,3
 13 Jun 2025 06:00,LPL,Bilibili Gaming,Invictus Gaming,under,total_barons 1.5,1.0,12.00%,1.25,1.4,BET365,url não disponível,win,,0.4,4
+14 Jun 2025 06:00,LPL,Anyone's Legend,Bilibili Gaming,under,total_dragons 4.5,4.0,30.00%,1.54,2.0,BET365,url não disponível,win,,1.0,1
+14 Jun 2025 06:00,LPL,Anyone's Legend,Bilibili Gaming,under,total_dragons 4.5,6.0,30.00%,1.54,2.0,BET365,url não disponível,loss,,-1.0,2
+14 Jun 2025 06:00,LPL,Anyone's Legend,Bilibili Gaming,under,total_dragons 4.5,5.0,30.00%,1.54,2.0,BET365,url não disponível,loss,,-1.0,3
+14 Jun 2025 06:00,LPL,Anyone's Legend,Bilibili Gaming,under,total_dragons 4.5,4.0,30.00%,1.54,2.0,BET365,url não disponível,win,,1.0,4
+14 Jun 2025 06:00,LPL,Anyone's Legend,Bilibili Gaming,under,total_towers 12.5,8.0,25.60%,1.25,1.57,BET365,url não disponível,win,,0.57,1
+14 Jun 2025 06:00,LPL,Anyone's Legend,Bilibili Gaming,under,total_towers 12.5,11.0,25.60%,1.25,1.57,BET365,url não disponível,win,,0.57,2
+14 Jun 2025 06:00,LPL,Anyone's Legend,Bilibili Gaming,under,total_towers 12.5,16.0,25.60%,1.25,1.57,BET365,url não disponível,loss,,-1.0,3
+14 Jun 2025 06:00,LPL,Anyone's Legend,Bilibili Gaming,under,total_towers 12.5,11.0,25.60%,1.25,1.57,BET365,url não disponível,win,,0.57,4
+14 Jun 2025 06:00,LPL,Anyone's Legend,Bilibili Gaming,under,game_duration 31.5,27.72,23.53%,1.48,1.83,BET365,url não disponível,win,,0.83,1
+14 Jun 2025 06:00,LPL,Anyone's Legend,Bilibili Gaming,under,game_duration 31.5,38.0,23.53%,1.48,1.83,BET365,url não disponível,loss,,-1.0,2
+14 Jun 2025 06:00,LPL,Anyone's Legend,Bilibili Gaming,under,game_duration 31.5,41.02,23.53%,1.48,1.83,BET365,url não disponível,loss,,-1.0,3
+14 Jun 2025 06:00,LPL,Anyone's Legend,Bilibili Gaming,under,game_duration 31.5,30.47,23.53%,1.48,1.83,BET365,url não disponível,win,,0.83,4
