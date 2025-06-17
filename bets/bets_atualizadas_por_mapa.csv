@@ -529,3 +529,12 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 14 Jun 2025 13:00,LTA S,FURIA,Isurus Estral,under,total_inhibitors 1.5,1.0,32.00%,1.67,2.2,BET365,url não disponível,win,,1.2,3
 14 Jun 2025 13:00,LTA S,FURIA,Isurus Estral,under,total_towers 12.5,11.0,10.67%,1.5,1.66,BET365,url não disponível,win,,0.66,4
 14 Jun 2025 13:00,LTA S,FURIA,Isurus Estral,under,total_inhibitors 1.5,2.0,32.00%,1.67,2.2,BET365,url não disponível,loss,,-1.0,4
+16 Jun 2025 12:00,NLC,Los Ratones,BoostGate Esports,over,total_kills 29.5,30.0,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,1
+16 Jun 2025 12:00,NLC,Los Ratones,BoostGate Esports,over,total_kills 29.5,33.0,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,2
+16 Jun 2025 12:00,NLC,Los Ratones,BoostGate Esports,over,total_kills 29.5,25.0,14.38%,1.6,1.83,BET365,url não disponível,loss,,-1.0,3
+16 Jun 2025 12:00,NLC,Los Ratones,BoostGate Esports,over,total_kills 29.5,38.0,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,4
+16 Jun 2025 12:00,NLC,Los Ratones,BoostGate Esports,over,total_kills 29.5,29.0,14.38%,1.6,1.83,BET365,url não disponível,loss,,-1.0,5
+16 Jun 2025 12:00,TCL,Misa Esports,BK ROG Esports,under,game_duration 32.5,34.05,22.00%,1.5,1.83,BET365,url não disponível,loss,,-1.0,1
+16 Jun 2025 12:00,TCL,Misa Esports,BK ROG Esports,under,game_duration 32.5,30.85,22.00%,1.5,1.83,BET365,url não disponível,win,,0.83,2
+16 Jun 2025 12:00,TCL,Misa Esports,BK ROG Esports,under,game_duration 32.5,34.98,22.00%,1.5,1.83,BET365,url não disponível,loss,,-1.0,3
+16 Jun 2025 12:00,TCL,Misa Esports,BK ROG Esports,under,game_duration 32.5,31.05,22.00%,1.5,1.83,BET365,url não disponível,win,,0.83,4
