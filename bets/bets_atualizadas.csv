@@ -169,8 +169,8 @@ date,league,t1,t2,bet_type,bet_line,ROI,fair_odds,odds,House,url,status,telegram
 14 Jun 2025 06:00,LPL,Anyone's Legend,Bilibili Gaming,under,total_dragons 4.5,30.00%,1.54,2.0,BET365,url não disponível,win,1,1,1.0
 14 Jun 2025 06:00,LPL,Anyone's Legend,Bilibili Gaming,under,total_towers 12.5,25.60%,1.25,1.57,BET365,url não disponível,win,1,1,0.57
 17 Jun 2025 12:00,LVP SL,Los Heretics,Karmine Corp Blue,under,total_kills 32.5,20.48%,1.52,1.83,BET365,url não disponível,win,1,1,0.83
-27 Jun 2025 16:00,LEC,G2 Esports,FURIA,over,total_towers 11.5,25.00%,1.6,2.0,BET365,url não disponível,loss,1,0,0.0
-27 Jun 2025 16:00,LEC,G2 Esports,FURIA,over,total_dragons 4.5,17.00%,1.54,1.8,BET365,url não disponível,loss,1,0,0.0
+27 Jun 2025 16:00,LEC,G2 Esports,FURIA,over,total_towers 11.5,25.00%,1.6,2.0,BET365,url não disponível,loss,1,1,-1.0
+27 Jun 2025 16:00,LEC,G2 Esports,FURIA,over,total_dragons 4.5,17.00%,1.54,1.8,BET365,url não disponível,loss,1,1,-1.0
 27 Jun 2025 21:00,LPL,Bilibili Gaming,GAM Esports,over,total_barons 1.5,112.50%,4.0,8.5,BET365,url não disponível,pending,1,0,0.0
 27 Jun 2025 21:00,LPL,Bilibili Gaming,GAM Esports,over,game_duration 29.5,23.53%,1.48,1.83,BET365,url não disponível,pending,1,0,0.0
 15 Jul 2025 04:00,LCKC,Dplus KIA Challengers,OKSavingsBank BRION Challengers,under,total_kills 35.5,41.83%,1.29,1.83,BET365,url não disponível,pending,1,0,0.0
