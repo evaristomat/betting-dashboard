@@ -564,3 +564,15 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 27 Jun 2025 21:00,LPL,Bilibili Gaming,GAM Esports,over,total_towers 11.5,10.0,10.25%,1.9,2.1,BET365,url não disponível,loss,,-1.0,3
 27 Jun 2025 21:00,LPL,Bilibili Gaming,GAM Esports,over,game_duration 29.5,25.7,23.53%,1.48,1.83,BET365,url não disponível,loss,,-1.0,3
 27 Jun 2025 21:00,LPL,Bilibili Gaming,GAM Esports,over,total_barons 1.5,0.0,112.50%,4.0,8.5,BET365,url não disponível,loss,,-1.0,3
+1 Jul 2025 21:00,LCK,Gen.G,G2 Esports,over,total_dragons 4.5,5.0,26.00%,1.67,2.1,BET365,url não disponível,win,,1.1,1
+1 Jul 2025 21:00,LCK,Gen.G,G2 Esports,under,total_inhibitors 1.5,1.0,23.53%,1.48,1.83,BET365,url não disponível,win,,0.83,1
+1 Jul 2025 21:00,LCK,Gen.G,G2 Esports,over,total_barons 1.5,1.0,37.50%,3.64,5.0,BET365,url não disponível,loss,,-1.0,1
+1 Jul 2025 21:00,LCK,Gen.G,G2 Esports,over,total_dragons 4.5,5.0,26.00%,1.67,2.1,BET365,url não disponível,win,,1.1,2
+1 Jul 2025 21:00,LCK,Gen.G,G2 Esports,under,total_inhibitors 1.5,2.0,23.53%,1.48,1.83,BET365,url não disponível,loss,,-1.0,2
+1 Jul 2025 21:00,LCK,Gen.G,G2 Esports,over,total_barons 1.5,1.0,37.50%,3.64,5.0,BET365,url não disponível,loss,,-1.0,2
+1 Jul 2025 21:00,LCK,Gen.G,G2 Esports,over,total_dragons 4.5,4.0,26.00%,1.67,2.1,BET365,url não disponível,loss,,-1.0,3
+1 Jul 2025 21:00,LCK,Gen.G,G2 Esports,under,total_inhibitors 1.5,1.0,23.53%,1.48,1.83,BET365,url não disponível,win,,0.83,3
+1 Jul 2025 21:00,LCK,Gen.G,G2 Esports,over,total_barons 1.5,0.0,37.50%,3.64,5.0,BET365,url não disponível,loss,,-1.0,3
+1 Jul 2025 21:00,LCK,Gen.G,G2 Esports,over,total_dragons 4.5,5.0,26.00%,1.67,2.1,BET365,url não disponível,win,,1.1,4
+1 Jul 2025 21:00,LCK,Gen.G,G2 Esports,under,total_inhibitors 1.5,2.0,23.53%,1.48,1.83,BET365,url não disponível,loss,,-1.0,4
+1 Jul 2025 21:00,LCK,Gen.G,G2 Esports,over,total_barons 1.5,1.0,37.50%,3.64,5.0,BET365,url não disponível,loss,,-1.0,4
