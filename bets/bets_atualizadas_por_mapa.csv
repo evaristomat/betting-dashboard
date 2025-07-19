@@ -656,3 +656,21 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 16 Jul 2025 17:00,LVP SL,Los Heretics,Veni Vidi Vici,over,total_kills 25.5,24.0,26.58%,1.45,1.83,BET365,url não disponível,loss,,-1.0,1
 16 Jul 2025 17:00,LVP SL,Los Heretics,Veni Vidi Vici,under,game_duration 32.5,22.13,12.85%,1.62,1.83,BET365,url não disponível,win,,0.83,1
 16 Jul 2025 17:00,LVP SL,Los Heretics,Veni Vidi Vici,under,total_barons 1.5,0.0,15.63%,1.08,1.25,BET365,url não disponível,win,,0.25,1
+17 Jul 2025 16:00,LVP SL,Los Heretics,GiantX,under,total_dragons 4.5,4.0,16.47%,1.89,2.2,BET365,url não disponível,win,,1.2,1
+17 Jul 2025 16:00,LVP SL,Los Heretics,GiantX,under,total_towers 12.5,10.0,17.35%,1.62,1.9,BET365,url não disponível,win,,0.9,1
+17 Jul 2025 16:00,LVP SL,Los Heretics,GiantX,under,game_duration 33.5,28.4,23.79%,1.48,1.83,BET365,url não disponível,win,,0.83,1
+17 Jul 2025 16:00,LVP SL,Los Heretics,GiantX,under,total_inhibitors 1.5,1.0,17.35%,1.79,2.1,BET365,url não disponível,win,,1.1,1
+17 Jul 2025 16:00,LVP SL,Los Heretics,GiantX,under,total_barons 1.5,1.0,13.44%,1.17,1.33,BET365,url não disponível,win,,0.33,1
+17 Jul 2025 17:00,LVP SL,Veni Vidi Vici,Ramboot Club,under,total_kills 32.5,44.0,16.45%,1.57,1.83,BET365,url não disponível,loss,,-1.0,1
+17 Jul 2025 17:00,LVP SL,Veni Vidi Vici,Ramboot Club,under,total_inhibitors 1.5,3.0,43.18%,1.47,2.1,BET365,url não disponível,loss,,-1.0,1
+17 Jul 2025 17:00,LVP SL,Veni Vidi Vici,Ramboot Club,under,total_barons 1.5,1.0,20.91%,1.1,1.33,BET365,url não disponível,win,,0.33,1
+17 Jul 2025 21:00,NACL,Dorado Gaming,Supernova,over,total_kills 29.5,21.0,12.85%,1.62,1.83,BET365,url não disponível,loss,,-1.0,1
+18 Jul 2025 22:00,NACL,Supernova,CCG Esports,over,total_kills 29.5,28.0,10.16%,1.66,1.83,BET365,url não disponível,loss,,-1.0,1
+19 Jul 2025 06:00,LPL,Weibo Gaming,FunPlus Phoenix,under,total_kills 30.5,14.0,18.95%,1.54,1.83,BET365,url não disponível,win,,0.83,1
+19 Jul 2025 06:00,LPL,Weibo Gaming,FunPlus Phoenix,under,total_kills 30.5,14.0,18.95%,1.54,1.83,BET365,url não disponível,win,,0.83,1
+19 Jul 2025 06:00,LPL,Weibo Gaming,FunPlus Phoenix,under,total_kills 30.5,26.0,18.95%,1.54,1.83,BET365,url não disponível,win,,0.83,2
+19 Jul 2025 06:00,LPL,Weibo Gaming,FunPlus Phoenix,under,total_kills 30.5,26.0,18.95%,1.54,1.83,BET365,url não disponível,win,,0.83,2
+19 Jul 2025 06:00,LPL,Weibo Gaming,FunPlus Phoenix,under,total_kills 30.5,16.0,18.95%,1.54,1.83,BET365,url não disponível,win,,0.83,3
+19 Jul 2025 06:00,LPL,Weibo Gaming,FunPlus Phoenix,under,total_kills 30.5,16.0,18.95%,1.54,1.83,BET365,url não disponível,win,,0.83,3
+19 Jul 2025 07:00,VCS,Saigon Dino,Never Give Up,over,total_kills 33.5,13.0,26.58%,1.45,1.83,BET365,url não disponível,loss,,-1.0,1
+19 Jul 2025 07:00,VCS,Saigon Dino,Never Give Up,over,total_kills 33.5,33.0,26.58%,1.45,1.83,BET365,url não disponível,loss,,-1.0,2
