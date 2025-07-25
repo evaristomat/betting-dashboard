@@ -350,6 +350,13 @@ def apply_optimized_strategy(df: pd.DataFrame, verbose: bool = False) -> pd.Data
     return analyzer.apply_optimized_strategy(df)
 
 
+def apply_strategy_to_pending_bets(
+    df_pending: pd.DataFrame, verbose: bool = False
+) -> pd.DataFrame:
+    """Aplica a estratégia às apostas pendentes - FUNÇÃO REQUERIDA PELO VISUALIZATIONS.PY"""
+    return apply_optimized_strategy(df_pending, verbose)
+
+
 def validate_strategy_criteria(df: pd.DataFrame) -> Dict:
     """Valida se os dados atendem aos critérios CORRETOS"""
     if df.empty:
