@@ -8,8 +8,13 @@ from dataclasses import dataclass
 class StrategyConfig:
     """Configuração SIMPLIFICADA - Foco no que REALMENTE importa"""
 
-    # ROI ranges: TODOS os ≥20% são válidos (foco na direção, não no ROI)
-    ALLOWED_ROI_RANGES = ["≥20%", "≥25%", "≥30%", "<15%"]
+    # ROI ranges REFINADOS baseados na nova análise aprimorada
+    ALLOWED_ROI_RANGES = [
+        "20-25%",
+        "15-20%",
+        "≥40%",
+        "10-15%",
+    ]  # Apenas os lucrativos dentro dos mercados bons
 
     # Mercados REAIS ordenados por LUCRO REAL da sua análise
     ALLOWED_MARKETS = [
@@ -102,20 +107,25 @@ class BettingStrategyAnalyzer:
         return direction, market_type, grouped_market
 
     def categorize_roi_ranges(self, roi: float) -> str:
-        """Categoriza ROI"""
+        """Categoriza ROI com ranges refinados baseados na nova análise"""
         if pd.isna(roi):
             return "N/A"
-
-        if roi >= 30:
-            return "≥30%"
-        elif roi >= 25:
-            return "≥25%"
-        elif roi >= 20:
-            return "≥20%"
-        elif roi >= 15:
+        elif roi < 10:
+            return "<10%"
+        elif roi < 15:
+            return "10-15%"
+        elif roi < 20:
             return "15-20%"
+        elif roi < 25:
+            return "20-25%"  # SWEET SPOT identificado (+26.1u, 80% win rate)
+        elif roi < 30:
+            return "25-30%"
+        elif roi < 35:
+            return "30-35%"
+        elif roi < 40:
+            return "35-40%"
         else:
-            return "<15%"
+            return "≥40%"
 
     def preprocess_dataframe(self, df: pd.DataFrame) -> pd.DataFrame:
         """Preprocessa o DataFrame"""
@@ -167,18 +177,24 @@ class BettingStrategyAnalyzer:
 
         df_filtered = df.copy()
 
-        # Filtro 1: ROI ≥20% OU <15% (os lucrativos da sua análise)
-        roi_condition = df_filtered["est_roi_category"].isin(["≥20%", "<15%"])
+        # Filtro 1: ROI ranges REFINADOS (baseados na análise aprimorada)
+        roi_condition = df_filtered["est_roi_category"].isin(
+            self.config.ALLOWED_ROI_RANGES
+        )
         df_filtered = df_filtered[roi_condition]
         if self.verbose:
-            print(f"   ✅ Após filtro ROI (≥20%, <15%): {len(df_filtered)} apostas")
+            print(
+                f"   ✅ Após filtro ROI otimizado (20-25%, 15-20%, ≥40%, 10-15%): {len(df_filtered)} apostas"
+            )
 
-        # Filtro 2: Odds válidas (tudo exceto muito_alta)
+        # Filtro 2: Odds REFINADAS (baseadas na nova análise)
         df_filtered = df_filtered[
-            ~df_filtered["odds_category"].isin(self.config.FORBIDDEN_ODDS)
+            df_filtered["odds_category"].isin(["media", "baixa", "media_alta"])
         ]
         if self.verbose:
-            print(f"   ✅ Após filtro odds: {len(df_filtered)} apostas")
+            print(
+                f"   ✅ Após filtro odds (media, baixa, media_alta): {len(df_filtered)} apostas"
+            )
 
         # Filtro 3: ESTRATÉGIA PRINCIPAL - Direção
         # Pegar TODOS os UNDER + apenas OVER-DRAGONS
@@ -217,15 +233,14 @@ class BettingStrategyAnalyzer:
 
         # Ordenar por prioridade REAL
         if len(df_filtered) > 0:
-            # Pesos baseados no LUCRO REAL
+            # Pesos baseados na NOVA ANÁLISE REAL
             market_weights = {
-                "UNDER - KILLS": 10,  # 15.1u - SEU MELHOR
-                "UNDER - TOWERS": 8,  # 10.1u - SEGUNDO
-                "OVER - DRAGONS": 6,  # 6.9u - TERCEIRO (único OVER bom)
-                "UNDER - DURATION": 4,  # 5.8u - QUARTO
-                "UNDER - BARONS": 3,  # 2.8u - QUINTO
-                "UNDER - INHIBITORS": 2,  # 2.6u - SEXTO
-                "UNDER - DRAGONS": 1,  # 2.4u - SÉTIMO
+                "UNDER - KILLS": 10,  # 27.8u - MELHOR ABSOLUTO (39.2% ROI, 76.1% WR)
+                "UNDER - TOWERS": 8,  # 17.3u - SEGUNDO LUGAR (18.0% ROI, 69.8% WR)
+                "UNDER - DRAGONS": 6,  # 7.8u - TERCEIRO (11.7% ROI, 55.2% WR)
+                "OVER - DRAGONS": 4,  # 2.2u - ÚNICO OVER BOM (6.7% ROI, 51.5% WR)
+                "UNDER - DURATION": 1,  # -1.2u - EVITAR (mas pode ter casos bons)
+                "UNDER - BARONS": 1,  # -1.9u - EVITAR (mas pode ter casos bons)
             }
 
             df_filtered["market_weight"] = (
@@ -309,24 +324,20 @@ class BettingStrategyAnalyzer:
 
         if stats.get("kills_count", 0) > 0:
             print(
-                f"   🏆 KILLS encontradas: {stats['kills_count']} (SEU MELHOR MERCADO - 15.1u)"
+                f"   🏆 KILLS encontradas: {stats['kills_count']} (MELHOR MERCADO - 27.8u, 39.2% ROI)"
             )
 
         if stats.get("towers_count", 0) > 0:
             print(
-                f"   💎 TOWERS encontradas: {stats['towers_count']} (SEGUNDO MELHOR - 10.1u)"
+                f"   💎 TOWERS encontradas: {stats['towers_count']} (SEGUNDO MELHOR - 17.3u, 18.0% ROI)"
             )
 
         if stats.get("dragons_count", 0) > 0:
-            dragons_under = len(
-                [m for m in stats.get("market_breakdown", {}) if "UNDER - DRAGONS" in m]
+            print(
+                f"   🐲 DRAGONS encontradas: {stats['dragons_count']} (UNDER: 7.8u + OVER: 2.2u)"
             )
-            dragons_over = len(
-                [m for m in stats.get("market_breakdown", {}) if "OVER - DRAGONS" in m]
-            )
-            print(f"   🐲 DRAGONS: {dragons_under} UNDER + {dragons_over} OVER")
 
-        print(f"   ✅ Estratégia SIMPLIFICADA aplicada - Foco na DIREÇÃO!")
+        print(f"   ✅ Estratégia REFINADA aplicada - Foco no range 20-25% ROI!")
 
 
 # Funções de conveniência
@@ -348,18 +359,18 @@ def get_strategy_summary() -> Dict:
     config = StrategyConfig()
 
     return {
-        "name": "Estratégia Simplificada - Foco em UNDER + OVER-DRAGONS",
-        "version": "v7.0_SIMPLIFIED",
-        "expected_roi": config.EXPECTED_ROI,  # CORRIGIDO: chave esperada pelo visualizations.py
-        "core_principle": "UNDER domina (+38.8u vs -15.2u OVER)",
-        "exception": "OVER-DRAGONS é o único OVER lucrativo (+6.9u)",
+        "name": "Estratégia Refinada - Baseada em Análise Aprimorada",
+        "version": "v8.0_REFINED",
+        "expected_roi": config.EXPECTED_ROI,
+        "sweet_spot": "Range 20-25% ROI (+26.1u, 80% win rate)",
+        "market_hierarchy": "KILLS > TOWERS > UNDER-DRAGONS > OVER-DRAGONS",
         "criteria": {
-            "roi_ranges": config.ALLOWED_ROI_RANGES,
+            "roi_ranges": config.ALLOWED_ROI_RANGES,  # Refinados: 20-25%, 15-20%, ≥40%, 10-15%
             "markets": config.ALLOWED_MARKETS,
-            "odds": config.ALLOWED_ODDS,
+            "odds": ["media", "baixa", "media_alta"],  # Refinadas baseadas na análise
             "preferred_direction": config.PREFERRED_DIRECTION,
             "excluded": {
-                "odds": config.FORBIDDEN_ODDS,
+                "odds": ["muito_alta", "muito_baixa"],  # Ambas negativas na análise
                 "markets": config.FORBIDDEN_MARKETS,
             },
         },
