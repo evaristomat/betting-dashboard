@@ -367,16 +367,16 @@ date,league,t1,t2,bet_type,bet_line,ROI,fair_odds,odds,House,url,status,telegram
 27 Jul 2025 11:00,HW,GLORE,BRUTE,over,total_kills 33.5,26.07%,1.45,1.83,BET365,url não disponível,pending,1,0,0.0
 27 Jul 2025 13:00,PRM,Austrian Force willhaben,ROSSMANN Centaurs,over,total_towers 12.5,26.56%,1.78,2.25,BET365,url não disponível,win,1,1,1.25
 27 Jul 2025 13:00,PRM,Austrian Force willhaben,ROSSMANN Centaurs,over,total_kills 30.5,14.38%,1.6,1.83,BET365,url não disponível,win,1,1,0.83
-28 Jul 2025 06:00,PCS,Frank Esports,CTBC Flying Oyster Academy,under,total_kills 36.5,49.96%,1.22,1.83,BET365,url não disponível,pending,1,0,0.0
-28 Jul 2025 08:00,LPL,Top Esports,JD Gaming,under,total_towers 12.5,30.24%,1.21,1.57,BET365,url não disponível,pending,1,0,0.0
-28 Jul 2025 08:00,LPL,Top Esports,JD Gaming,over,total_kills 28.5,26.16%,1.45,1.83,BET365,url não disponível,pending,1,0,0.0
-28 Jul 2025 17:00,CD,Flamengo MDL,Los Grandes,under,total_kills 31.5,44.88%,1.26,1.83,BET365,url não disponível,pending,1,0,0.0
-28 Jul 2025 18:00,CD,Rise Gaming,Corinthians Esports,under,total_kills 30.5,22.14%,1.56,1.9,BET365,url não disponível,pending,1,0,0.0
-28 Jul 2025 19:00,CD,Stellae Gaming,KaBuM! Ilha das Lendas,under,total_kills 30.5,24.00%,1.45,1.8,BET365,url não disponível,pending,1,0,0.0
-28 Jul 2025 20:00,CD,Vivo Keyd Stars Academy,e-Champ Gaming,over,total_kills 31.5,33.09%,1.38,1.83,BET365,url não disponível,pending,1,0,0.0
-28 Jul 2025 21:00,CD,RED Academy,Alpha7 Esports,under,total_kills 31.5,14.38%,1.6,1.83,BET365,url não disponível,pending,1,0,0.0
-29 Jul 2025 06:00,LPL,Ultra Prime,LGD Gaming,under,total_towers 12.5,23.36%,1.31,1.61,BET365,url não disponível,pending,1,0,0.0
-29 Jul 2025 06:00,LPL,Ultra Prime,LGD Gaming,under,total_dragons 4.5,16.88%,1.71,2.0,BET365,url não disponível,pending,1,0,0.0
+28 Jul 2025 06:00,PCS,Frank Esports,CTBC Flying Oyster Academy,under,total_kills 36.5,49.96%,1.22,1.83,BET365,url não disponível,win,1,0,0.0
+28 Jul 2025 08:00,LPL,Top Esports,JD Gaming,under,total_towers 12.5,30.24%,1.21,1.57,BET365,url não disponível,loss,1,0,0.0
+28 Jul 2025 08:00,LPL,Top Esports,JD Gaming,over,total_kills 28.5,26.16%,1.45,1.83,BET365,url não disponível,loss,1,0,0.0
+28 Jul 2025 17:00,CD,Flamengo MDL,Los Grandes,under,total_kills 31.5,44.88%,1.26,1.83,BET365,url não disponível,win,1,0,0.0
+28 Jul 2025 18:00,CD,Rise Gaming,Corinthians Esports,under,total_kills 30.5,22.14%,1.56,1.9,BET365,url não disponível,win,1,0,0.0
+28 Jul 2025 19:00,CD,Stellae Gaming,KaBuM! Ilha das Lendas,under,total_kills 30.5,24.00%,1.45,1.8,BET365,url não disponível,win,1,0,0.0
+28 Jul 2025 20:00,CD,Vivo Keyd Stars Academy,e-Champ Gaming,over,total_kills 31.5,33.09%,1.38,1.83,BET365,url não disponível,win,1,0,0.0
+28 Jul 2025 21:00,CD,RED Academy,Alpha7 Esports,under,total_kills 31.5,14.38%,1.6,1.83,BET365,url não disponível,win,1,0,0.0
+29 Jul 2025 06:00,LPL,Ultra Prime,LGD Gaming,under,total_towers 12.5,23.36%,1.31,1.61,BET365,url não disponível,win,1,0,0.0
+29 Jul 2025 06:00,LPL,Ultra Prime,LGD Gaming,under,total_dragons 4.5,16.88%,1.71,2.0,BET365,url não disponível,win,1,0,0.0
 29 Jul 2025 08:00,LPL,FunPlus Phoenix,Invictus Gaming,over,total_kills 28.5,22.00%,1.5,1.83,BET365,url não disponível,pending,1,0,0.0
 29 Jul 2025 08:00,LPL,FunPlus Phoenix,Invictus Gaming,under,total_towers 12.5,11.21%,1.41,1.57,BET365,url não disponível,pending,1,0,0.0
 29 Jul 2025 18:00,CD,Los Grandes,RED Academy,under,total_kills 31.5,14.38%,1.6,1.83,BET365,url não disponível,pending,1,0,0.0
@@ -398,8 +398,8 @@ date,league,t1,t2,bet_type,bet_line,ROI,fair_odds,odds,House,url,status,telegram
 31 Jul 2025 15:00,ROL,ZennIT,A One Man Army,under,total_kills 31.5,37.25%,1.33,1.83,BET365,url não disponível,pending,1,0,0.0
 31 Jul 2025 16:00,NLC,Verdant,Venomcrest Esports,over,total_barons 1.5,62.38%,2.67,4.33,BET365,url não disponível,pending,1,0,0.0
 31 Jul 2025 16:00,NLC,Verdant,Venomcrest Esports,over,total_dragons 4.5,31.25%,1.6,2.1,BET365,url não disponível,pending,1,0,0.0
-29 Jul 2025 05:00,LCKC,OKSavingsBank BRION Challengers,Nongshim Esports Academy,over,total_kills 28.5,56.86%,1.17,1.83,BET365,url não disponível,pending,1,0,0.0
-29 Jul 2025 05:00,LCKC,OKSavingsBank BRION Challengers,Nongshim Esports Academy,under,total_inhibitors 1.5,22.14%,1.56,1.9,BET365,url não disponível,pending,1,0,0.0
+29 Jul 2025 05:00,LCKC,OKSavingsBank BRION Challengers,Nongshim Esports Academy,over,total_kills 28.5,56.86%,1.17,1.83,BET365,url não disponível,loss,1,0,0.0
+29 Jul 2025 05:00,LCKC,OKSavingsBank BRION Challengers,Nongshim Esports Academy,under,total_inhibitors 1.5,22.14%,1.56,1.9,BET365,url não disponível,win,1,0,0.0
 29 Jul 2025 07:00,LCKC,BNK FEARX Youth,T1 Esports Academy,under,total_dragons 4.5,75.00%,1.14,2.0,BET365,url não disponível,pending,1,0,0.0
 29 Jul 2025 07:00,LCKC,BNK FEARX Youth,T1 Esports Academy,over,total_inhibitors 1.5,35.00%,1.33,1.8,BET365,url não disponível,pending,1,0,0.0
 29 Jul 2025 13:00,LVP SL,ZETA,LUA Gaming,under,game_duration 31.5,16.92%,1.57,1.83,BET365,url não disponível,pending,1,0,0.0
