@@ -1276,10 +1276,33 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 29 Jul 2025 15:00,RL,Zero Tenacity,DOCISK,over,total_kills 29.5,42.0,10.56%,1.66,1.83,BET365,url não disponível,win,,0.83,2
 29 Jul 2025 15:00,RL,Zero Tenacity,DOCISK,over,game_duration 29.5,34.7,29.62%,1.41,1.83,BET365,url não disponível,win,,0.83,2
 29 Jul 2025 15:00,RL,Zero Tenacity,DOCISK,under,total_inhibitors 1.5,1.0,17.19%,1.92,2.25,BET365,url não disponível,win,,1.25,2
+29 Jul 2025 16:00,LVP SL,LUA Gaming,Barça eSports,over,total_dragons 4.5,4.0,14.58%,2.18,2.5,BET365,url não disponível,loss,,-1.0,1
+29 Jul 2025 16:00,LVP SL,LUA Gaming,Barça eSports,under,game_duration 32.5,28.3,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,1
+29 Jul 2025 16:00,LVP SL,LUA Gaming,Barça eSports,under,total_inhibitors 1.5,2.0,10.83%,1.71,1.9,BET365,url não disponível,loss,,-1.0,1
 29 Jul 2025 16:00,LVP SL,UCAM Esports,Los Heretics,over,total_dragons 4.5,5.0,31.00%,2.0,2.62,BET365,url não disponível,win,,1.62,1
 29 Jul 2025 16:00,LVP SL,UCAM Esports,Los Heretics,under,total_inhibitors 1.5,3.0,23.50%,1.54,1.9,BET365,url não disponível,loss,,-1.0,1
+29 Jul 2025 17:00,LVP SL,Veni Vidi Vici,ZETA,over,total_towers 12.5,16.0,15.61%,1.82,2.1,BET365,url não disponível,win,,1.1,1
+29 Jul 2025 17:00,LVP SL,Veni Vidi Vici,ZETA,over,total_kills 30.5,36.0,19.23%,1.53,1.83,BET365,url não disponível,win,,0.83,1
 29 Jul 2025 18:00,CD,Los Grandes,RED Academy,under,total_kills 31.5,29.0,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,1
 29 Jul 2025 20:00,CD,Corinthians Esports,Vivo Keyd Stars Academy,under,total_kills 31.5,20.0,28.34%,1.43,1.83,BET365,url não disponível,win,,0.83,1
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,over,total_kills 26.5,25.0,29.62%,1.41,1.83,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,over,total_kills 26.5,25.0,29.62%,1.41,1.83,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,over,game_duration 33.5,49.88,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,1
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,over,game_duration 33.5,49.88,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,1
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,under,total_inhibitors 1.5,5.0,37.25%,1.33,1.83,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,under,total_inhibitors 1.5,5.0,37.25%,1.33,1.83,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,over,total_kills 26.5,19.0,29.62%,1.41,1.83,BET365,url não disponível,loss,,-1.0,2
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,over,total_kills 26.5,19.0,29.62%,1.41,1.83,BET365,url não disponível,loss,,-1.0,2
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,over,game_duration 33.5,35.73,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,2
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,over,game_duration 33.5,35.73,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,2
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,under,total_inhibitors 1.5,1.0,37.25%,1.33,1.83,BET365,url não disponível,win,,0.83,2
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,under,total_inhibitors 1.5,1.0,37.25%,1.33,1.83,BET365,url não disponível,win,,0.83,2
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,over,total_kills 26.5,42.0,29.62%,1.41,1.83,BET365,url não disponível,win,,0.83,3
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,over,total_kills 26.5,42.0,29.62%,1.41,1.83,BET365,url não disponível,win,,0.83,3
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,over,game_duration 33.5,44.98,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,3
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,over,game_duration 33.5,44.98,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,3
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,under,total_inhibitors 1.5,4.0,37.25%,1.33,1.83,BET365,url não disponível,loss,,-1.0,3
+30 Jul 2025 05:00,LCK,DRX,Dplus KIA,under,total_inhibitors 1.5,4.0,37.25%,1.33,1.83,BET365,url não disponível,loss,,-1.0,3
 30 Jul 2025 05:00,LCKC,Gen.G Global Academy,DRX Challengers,under,total_kills 29.5,33.0,12.41%,1.63,1.83,BET365,url não disponível,loss,,-1.0,1
 30 Jul 2025 05:00,LCKC,Gen.G Global Academy,DRX Challengers,under,total_kills 29.5,51.0,12.41%,1.63,1.83,BET365,url não disponível,loss,,-1.0,2
 30 Jul 2025 06:00,LPL,Anyone's Legend,Team WE,under,total_dragons 4.5,4.0,22.00%,1.5,1.83,BET365,url não disponível,win,,0.83,1
@@ -1304,3 +1327,114 @@ date,league,t1,t2,bet_type,bet_line,bet_result,ROI,fair_odds,odds,House,url,stat
 30 Jul 2025 07:00,LCKC,Dplus KIA Challengers,Hanwha Life Esports Challengers,under,total_inhibitors 1.5,1.0,12.42%,1.69,1.9,BET365,url não disponível,win,,0.9,1
 30 Jul 2025 07:00,LCKC,Dplus KIA Challengers,Hanwha Life Esports Challengers,over,total_dragons 4.5,5.0,24.70%,1.38,1.72,BET365,url não disponível,win,,0.72,2
 30 Jul 2025 07:00,LCKC,Dplus KIA Challengers,Hanwha Life Esports Challengers,under,total_inhibitors 1.5,4.0,12.42%,1.69,1.9,BET365,url não disponível,loss,,-1.0,2
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_dragons 4.5,4.0,56.25%,1.6,2.5,BET365,url não disponível,win,,1.5,1
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_dragons 4.5,4.0,56.25%,1.6,2.5,BET365,url não disponível,win,,1.5,1
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_towers 11.5,8.0,10.67%,1.5,1.66,BET365,url não disponível,win,,0.66,1
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_towers 11.5,8.0,10.67%,1.5,1.66,BET365,url não disponível,win,,0.66,1
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_inhibitors 1.5,1.0,96.88%,1.14,2.25,BET365,url não disponível,win,,1.25,1
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_inhibitors 1.5,1.0,96.88%,1.14,2.25,BET365,url não disponível,win,,1.25,1
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_barons 1.5,0.0,19.79%,1.04,1.25,BET365,url não disponível,win,,0.25,1
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_barons 1.5,0.0,19.79%,1.04,1.25,BET365,url não disponível,win,,0.25,1
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_dragons 4.5,4.0,56.25%,1.6,2.5,BET365,url não disponível,win,,1.5,2
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_dragons 4.5,4.0,56.25%,1.6,2.5,BET365,url não disponível,win,,1.5,2
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_towers 11.5,11.0,10.67%,1.5,1.66,BET365,url não disponível,win,,0.66,2
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_towers 11.5,11.0,10.67%,1.5,1.66,BET365,url não disponível,win,,0.66,2
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_inhibitors 1.5,3.0,96.88%,1.14,2.25,BET365,url não disponível,loss,,-1.0,2
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_inhibitors 1.5,3.0,96.88%,1.14,2.25,BET365,url não disponível,loss,,-1.0,2
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_barons 1.5,1.0,19.79%,1.04,1.25,BET365,url não disponível,win,,0.25,2
+30 Jul 2025 07:00,LCK,KT Rolster,T1,under,total_barons 1.5,1.0,19.79%,1.04,1.25,BET365,url não disponível,win,,0.25,2
+30 Jul 2025 13:00,LFL,Gentle Mates,Vitality.Bee,under,game_duration 32.5,54.08,11.11%,1.65,1.83,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 13:00,LFL,Gentle Mates,Vitality.Bee,under,game_duration 32.5,36.18,11.11%,1.65,1.83,BET365,url não disponível,loss,,-1.0,2
+30 Jul 2025 13:00,LFL,Gentle Mates,Vitality.Bee,under,game_duration 32.5,35.28,11.11%,1.65,1.83,BET365,url não disponível,loss,,-1.0,3
+30 Jul 2025 13:00,LVP SL,Guasones,Los Heretics,under,total_kills 26.5,36.0,35.22%,1.35,1.83,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 13:00,LVP SL,Guasones,Los Heretics,under,total_inhibitors 1.5,2.0,59.39%,1.19,1.9,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 15:00,PRM,Eintracht Frankfurt,Berlin International Gaming,over,total_towers 12.5,9.0,16.85%,2.03,2.37,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 15:00,PRM,Eintracht Frankfurt,Berlin International Gaming,over,total_towers 12.5,18.0,16.85%,2.03,2.37,BET365,url não disponível,win,,1.37,2
+30 Jul 2025 15:00,PRM,Eintracht Frankfurt,Berlin International Gaming,over,total_towers 12.5,13.0,16.85%,2.03,2.37,BET365,url não disponível,win,,1.37,3
+30 Jul 2025 15:00,LVP SL,LUA Gaming,Barça eSports,under,game_duration 32.5,28.3,14.38%,1.6,1.83,BET365,url não disponível,win,,0.83,1
+30 Jul 2025 15:00,LVP SL,LUA Gaming,Barça eSports,under,total_inhibitors 1.5,2.0,10.83%,1.71,1.9,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 16:00,LFL,Ici Japon Corp. Esport,Karmine Corp Blue,under,total_towers 12.5,15.0,14.00%,1.26,1.44,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 16:00,LFL,Ici Japon Corp. Esport,Karmine Corp Blue,under,total_towers 12.5,11.0,14.00%,1.26,1.44,BET365,url não disponível,win,,0.44,2
+30 Jul 2025 16:00,NLC,NORD Esports,Bulldog Esports,over,total_dragons 4.5,3.0,12.50%,2.0,2.25,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 16:00,NLC,NORD Esports,Bulldog Esports,over,total_kills 33.5,29.0,14.38%,1.6,1.83,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 16:00,NLC,NORD Esports,Bulldog Esports,over,game_duration 30.5,25.43,14.38%,1.6,1.83,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 16:00,NLC,NORD Esports,Bulldog Esports,over,total_inhibitors 1.5,1.0,24.50%,1.33,1.66,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 16:00,NLC,NORD Esports,Bulldog Esports,over,total_barons 1.5,0.0,12.50%,4.0,4.5,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 16:00,NLC,NORD Esports,Bulldog Esports,over,total_dragons 4.5,3.0,12.50%,2.0,2.25,BET365,url não disponível,loss,,-1.0,2
+30 Jul 2025 16:00,NLC,NORD Esports,Bulldog Esports,over,total_kills 33.5,27.0,14.38%,1.6,1.83,BET365,url não disponível,loss,,-1.0,2
+30 Jul 2025 16:00,NLC,NORD Esports,Bulldog Esports,over,game_duration 30.5,26.28,14.38%,1.6,1.83,BET365,url não disponível,loss,,-1.0,2
+30 Jul 2025 16:00,NLC,NORD Esports,Bulldog Esports,over,total_inhibitors 1.5,1.0,24.50%,1.33,1.66,BET365,url não disponível,loss,,-1.0,2
+30 Jul 2025 16:00,NLC,NORD Esports,Bulldog Esports,over,total_barons 1.5,0.0,12.50%,4.0,4.5,BET365,url não disponível,loss,,-1.0,2
+30 Jul 2025 17:00,LVP SL,Veni Vidi Vici,ZETA,over,total_towers 12.5,16.0,15.61%,1.82,2.1,BET365,url não disponível,win,,1.1,1
+30 Jul 2025 17:00,LVP SL,Veni Vidi Vici,ZETA,over,total_kills 30.5,36.0,19.23%,1.53,1.83,BET365,url não disponível,win,,0.83,1
+30 Jul 2025 17:00,LVP SL,Veni Vidi Vici,ZETA,under,game_duration 32.5,30.03,12.76%,1.62,1.83,BET365,url não disponível,win,,0.83,1
+30 Jul 2025 18:00,CD,RED Academy,e-Champ Gaming,over,total_kills 31.5,35.0,60.13%,1.14,1.83,BET365,url não disponível,win,,0.83,1
+30 Jul 2025 20:00,CD,Stellae Gaming,Los Grandes,under,total_kills 30.5,35.0,68.89%,1.12,1.9,BET365,url não disponível,loss,,-1.0,1
+30 Jul 2025 21:00,CD,Alpha7 Esports,Corinthians Esports,under,total_kills 31.5,25.0,71.56%,1.07,1.83,BET365,url não disponível,win,,0.83,1
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,under,total_dragons 4.5,6.0,12.50%,2.0,2.25,BET365,url não disponível,loss,,-1.0,1
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,under,total_dragons 4.5,6.0,12.50%,2.0,2.25,BET365,url não disponível,loss,,-1.0,1
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,over,total_kills 25.5,36.0,44.88%,1.26,1.83,BET365,url não disponível,win,,0.83,1
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,over,total_kills 25.5,36.0,44.88%,1.26,1.83,BET365,url não disponível,win,,0.83,1
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,under,total_inhibitors 1.5,2.0,66.25%,1.26,2.1,BET365,url não disponível,loss,,-1.0,1
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,under,total_inhibitors 1.5,2.0,66.25%,1.26,2.1,BET365,url não disponível,loss,,-1.0,1
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,under,total_barons 1.5,2.0,18.75%,1.26,1.5,BET365,url não disponível,loss,,-1.0,1
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,under,total_barons 1.5,2.0,18.75%,1.26,1.5,BET365,url não disponível,loss,,-1.0,1
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,under,total_dragons 4.5,5.0,12.50%,2.0,2.25,BET365,url não disponível,loss,,-1.0,2
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,under,total_dragons 4.5,5.0,12.50%,2.0,2.25,BET365,url não disponível,loss,,-1.0,2
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,over,total_kills 25.5,43.0,44.88%,1.26,1.83,BET365,url não disponível,win,,0.83,2
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,over,total_kills 25.5,43.0,44.88%,1.26,1.83,BET365,url não disponível,win,,0.83,2
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,under,total_inhibitors 1.5,1.0,66.25%,1.26,2.1,BET365,url não disponível,win,,1.1,2
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,under,total_inhibitors 1.5,1.0,66.25%,1.26,2.1,BET365,url não disponível,win,,1.1,2
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,under,total_barons 1.5,0.0,18.75%,1.26,1.5,BET365,url não disponível,win,,0.5,2
+31 Jul 2025 05:00,LCK,BNK FEARX,OKSavingsBank BRION,under,total_barons 1.5,0.0,18.75%,1.26,1.5,BET365,url não disponível,win,,0.5,2
+31 Jul 2025 05:00,LCKC,T1 Esports Academy,KT Rolster Challengers,under,total_dragons 4.5,5.0,60.00%,1.25,2.0,BET365,url não disponível,loss,,-1.0,1
+31 Jul 2025 05:00,LCKC,T1 Esports Academy,KT Rolster Challengers,over,total_inhibitors 1.5,2.0,44.00%,1.25,1.8,BET365,url não disponível,win,,0.8,1
+31 Jul 2025 05:00,LCKC,T1 Esports Academy,KT Rolster Challengers,under,total_barons 1.5,1.0,14.00%,1.05,1.2,BET365,url não disponível,win,,0.2,1
+31 Jul 2025 05:00,LCKC,T1 Esports Academy,KT Rolster Challengers,under,total_dragons 4.5,5.0,60.00%,1.25,2.0,BET365,url não disponível,loss,,-1.0,2
+31 Jul 2025 05:00,LCKC,T1 Esports Academy,KT Rolster Challengers,over,total_inhibitors 1.5,2.0,44.00%,1.25,1.8,BET365,url não disponível,win,,0.8,2
+31 Jul 2025 05:00,LCKC,T1 Esports Academy,KT Rolster Challengers,under,total_barons 1.5,1.0,14.00%,1.05,1.2,BET365,url não disponível,win,,0.2,2
+31 Jul 2025 05:00,LCKC,T1 Esports Academy,KT Rolster Challengers,under,total_dragons 4.5,4.0,60.00%,1.25,2.0,BET365,url não disponível,win,,1.0,3
+31 Jul 2025 05:00,LCKC,T1 Esports Academy,KT Rolster Challengers,over,total_inhibitors 1.5,1.0,44.00%,1.25,1.8,BET365,url não disponível,loss,,-1.0,3
+31 Jul 2025 05:00,LCKC,T1 Esports Academy,KT Rolster Challengers,under,total_barons 1.5,1.0,14.00%,1.05,1.2,BET365,url não disponível,win,,0.2,3
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_dragons 4.5,4.0,10.83%,1.71,1.9,BET365,url não disponível,win,,0.9,1
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_dragons 4.5,4.0,10.83%,1.71,1.9,BET365,url não disponível,win,,0.9,1
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_towers 12.5,10.0,24.29%,1.26,1.57,BET365,url não disponível,win,,0.57,1
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_towers 12.5,10.0,24.29%,1.26,1.57,BET365,url não disponível,win,,0.57,1
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_inhibitors 1.5,1.0,14.67%,1.5,1.72,BET365,url não disponível,win,,0.72,1
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_inhibitors 1.5,1.0,14.67%,1.5,1.72,BET365,url não disponível,win,,0.72,1
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_dragons 4.5,4.0,10.83%,1.71,1.9,BET365,url não disponível,win,,0.9,2
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_dragons 4.5,4.0,10.83%,1.71,1.9,BET365,url não disponível,win,,0.9,2
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_towers 12.5,11.0,24.29%,1.26,1.57,BET365,url não disponível,win,,0.57,2
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_towers 12.5,11.0,24.29%,1.26,1.57,BET365,url não disponível,win,,0.57,2
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_inhibitors 1.5,1.0,14.67%,1.5,1.72,BET365,url não disponível,win,,0.72,2
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_inhibitors 1.5,1.0,14.67%,1.5,1.72,BET365,url não disponível,win,,0.72,2
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_dragons 4.5,4.0,10.83%,1.71,1.9,BET365,url não disponível,win,,0.9,3
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_dragons 4.5,4.0,10.83%,1.71,1.9,BET365,url não disponível,win,,0.9,3
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_towers 12.5,10.0,24.29%,1.26,1.57,BET365,url não disponível,win,,0.57,3
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_towers 12.5,10.0,24.29%,1.26,1.57,BET365,url não disponível,win,,0.57,3
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_inhibitors 1.5,1.0,14.67%,1.5,1.72,BET365,url não disponível,win,,0.72,3
+31 Jul 2025 06:00,LPL,Top Esports,Team WE,under,total_inhibitors 1.5,1.0,14.67%,1.5,1.72,BET365,url não disponível,win,,0.72,3
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,under,total_dragons 4.5,3.0,17.25%,1.42,1.66,BET365,url não disponível,win,,0.66,1
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,under,total_dragons 4.5,3.0,17.25%,1.42,1.66,BET365,url não disponível,win,,0.66,1
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,under,total_towers 11.5,12.0,25.59%,1.37,1.72,BET365,url não disponível,loss,,-1.0,1
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,under,total_towers 11.5,12.0,25.59%,1.37,1.72,BET365,url não disponível,loss,,-1.0,1
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,over,total_kills 28.5,30.0,23.45%,1.48,1.83,BET365,url não disponível,win,,0.83,1
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,over,total_kills 28.5,30.0,23.45%,1.48,1.83,BET365,url não disponível,win,,0.83,1
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,under,total_inhibitors 1.5,1.0,72.00%,1.0,1.72,BET365,url não disponível,win,,0.72,1
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,under,total_inhibitors 1.5,1.0,72.00%,1.0,1.72,BET365,url não disponível,win,,0.72,1
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,under,total_dragons 4.5,4.0,17.25%,1.42,1.66,BET365,url não disponível,win,,0.66,2
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,under,total_dragons 4.5,4.0,17.25%,1.42,1.66,BET365,url não disponível,win,,0.66,2
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,under,total_towers 11.5,11.0,25.59%,1.37,1.72,BET365,url não disponível,win,,0.72,2
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,under,total_towers 11.5,11.0,25.59%,1.37,1.72,BET365,url não disponível,win,,0.72,2
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,over,total_kills 28.5,39.0,23.45%,1.48,1.83,BET365,url não disponível,win,,0.83,2
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,over,total_kills 28.5,39.0,23.45%,1.48,1.83,BET365,url não disponível,win,,0.83,2
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,under,total_inhibitors 1.5,1.0,72.00%,1.0,1.72,BET365,url não disponível,win,,0.72,2
+31 Jul 2025 07:00,LCK,Nongshim RedForce,Hanwha Life Esports,under,total_inhibitors 1.5,1.0,72.00%,1.0,1.72,BET365,url não disponível,win,,0.72,2
+31 Jul 2025 07:00,LCKC,OKSavingsBank BRION Challengers,DN Freecs Challengers,over,total_dragons 4.5,3.0,16.71%,1.47,1.72,BET365,url não disponível,loss,,-1.0,1
+31 Jul 2025 07:00,LCKC,OKSavingsBank BRION Challengers,DN Freecs Challengers,over,total_kills 29.5,23.0,38.56%,1.32,1.83,BET365,url não disponível,loss,,-1.0,1
+31 Jul 2025 07:00,LCKC,OKSavingsBank BRION Challengers,DN Freecs Challengers,over,game_duration 32.5,27.53,11.11%,1.65,1.83,BET365,url não disponível,loss,,-1.0,1
+31 Jul 2025 07:00,LCKC,OKSavingsBank BRION Challengers,DN Freecs Challengers,under,total_inhibitors 1.5,1.0,11.29%,1.71,1.9,BET365,url não disponível,win,,0.9,1
+31 Jul 2025 07:00,LCKC,OKSavingsBank BRION Challengers,DN Freecs Challengers,over,total_dragons 4.5,4.0,16.71%,1.47,1.72,BET365,url não disponível,loss,,-1.0,2
+31 Jul 2025 07:00,LCKC,OKSavingsBank BRION Challengers,DN Freecs Challengers,over,total_kills 29.5,28.0,38.56%,1.32,1.83,BET365,url não disponível,loss,,-1.0,2
+31 Jul 2025 07:00,LCKC,OKSavingsBank BRION Challengers,DN Freecs Challengers,over,game_duration 32.5,26.53,11.11%,1.65,1.83,BET365,url não disponível,loss,,-1.0,2
+31 Jul 2025 07:00,LCKC,OKSavingsBank BRION Challengers,DN Freecs Challengers,under,total_inhibitors 1.5,1.0,11.29%,1.71,1.9,BET365,url não disponível,win,,0.9,2
