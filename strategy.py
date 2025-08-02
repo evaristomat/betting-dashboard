@@ -6,51 +6,53 @@ from dataclasses import dataclass
 
 @dataclass
 class StrategyConfig:
-    """Configuração REFINADA - Apenas mercados comprovadamente lucrativos"""
+    """Configuração ROI 20+ - Baseada na análise refinada"""
 
-    # ROI ranges baseados na análise real
+    # ROI ranges baseados na análise real (mantendo formato original)
     ALLOWED_ROI_RANGES = [
-        "≥40%",  # 8.2u lucro, 24.7% ROI real
-        "25-30%",  # 8.6u lucro, 48.0% ROI real
-        "20-25%",  # 3.5u lucro, 9.1% ROI real
+        "≥40%",
+        "35-40%",
+        "30-35%",
+        "25-30%",
+        "20-25%",
     ]
 
-    # Mercados LUCRATIVOS baseados na análise real
+    # Mercados PERMITIDOS baseados na análise refinada
     ALLOWED_MARKETS = [
-        "OVER - KILLS",  # 11.3u | 38.8% ROI | 75.9% Win Rate - 🏆 MELHOR
-        "UNDER - INHIBITORS",  # 4.8u  | 13.0% ROI | 62.2% Win Rate - 💎 SÓLIDO
-        "UNDER - DRAGONS",  # 3.6u  | 15.8% ROI | 60.9% Win Rate - ✅ BOM
-        "UNDER - KILLS",  # 0.8u  | 6.8%  ROI | 58.3% Win Rate - ✅ MARGINAL
-        "UNDER - TOWERS",  # Mantido conforme solicitado
-        "OVER - INHIBITORS",  # 0.5u  | 4.3%  ROI | 58.3% Win Rate - ✅ MARGINAL
+        "UNDER - TOWERS",  # 27.2u lucro, 18.4% ROI, 69.6% Win Rate
+        "UNDER - DRAGONS",  # 21.2u lucro, 21.7% ROI, 57.1% Win Rate - CONSISTENTE
+        "UNDER - KILLS",  # 14.1u lucro, 19.5% ROI, 65.3% Win Rate
+        "UNDER - BARONS",  # 2.6u lucro, 11.3% ROI, 82.6% Win Rate
+        "UNDER - INHIBITORS",  # Incluído por consistência
+        "OVER - KILLS",  # 12.0u lucro, 16.2% ROI, 63.5% Win Rate - CONSISTENTE
     ]
 
     # Odds lucrativas baseadas na análise
-    ALLOWED_ODDS = ["media"]  # Única categoria com lucro positivo (5.9u)
+    ALLOWED_ODDS = ["baixa", "media", "media_alta"]
 
     # Direção preferencial baseada nos dados
-    PREFERRED_DIRECTION = "OVER"  # 2.8u vs -0.1u UNDER
+    PREFERRED_DIRECTION = "UNDER"  # +59.3u vs +1.9u OVER
 
-    # Mercados PROIBIDOS (removidos conforme solicitado)
+    # Mercados PROIBIDOS
     FORBIDDEN_MARKETS = [
-        "OVER - DRAGONS",  # Removido conforme solicitado
-        "UNDER - BARONS",  # Removido conforme solicitado
-        "OVER - BARONS",  # Removido conforme solicitado
-        "UNDER - DURATION",  # Removido conforme solicitado
-        "OVER - DURATION",  # Removido conforme solicitado
-        "OVER - TOWERS",  # Removido conforme solicitado
+        "OVER - TOWERS",  # -1.1u lucro, -3.9% ROI
+        "OVER - BARONS",  # -2.0u lucro, -40.0% ROI
+        "OVER - DURATION",  # -2.2u lucro, -14.6% ROI
+        "UNDER - DURATION",  # -2.7u lucro, -2.8% ROI
+        "OVER - INHIBITORS",  # -8.9u lucro, -38.5% ROI
+        "OVER - DRAGONS",  # Performance negativa
     ]
 
     # Odds problemáticas
     FORBIDDEN_ODDS = ["muito_alta", "muito_baixa", "alta"]
 
     # Performance esperada baseada nos dados reais
-    EXPECTED_ROI = 15.0  # Estimativa conservadora
-    EXPECTED_PROFIT = 20.0  # Estimativa conservadora
+    EXPECTED_ROI = 8.0
+    EXPECTED_PROFIT = 61.2
 
 
 class BettingStrategyAnalyzer:
-    """Analisador focado apenas em mercados lucrativos"""
+    """Analisador de apostas com estratégia ROI 20+"""
 
     def __init__(self, config: StrategyConfig = None):
         self.config = config or StrategyConfig()
@@ -167,43 +169,47 @@ class BettingStrategyAnalyzer:
         return df
 
     def apply_strategy_filters(self, df: pd.DataFrame) -> pd.DataFrame:
-        """Aplica filtros da estratégia focada em mercados lucrativos"""
+        """Aplica filtros da estratégia ROI 20+"""
         if df.empty:
             return df.copy()
 
         if self.verbose:
-            print(
-                f"🎯 ESTRATÉGIA REFINADA - Foco em mercados comprovadamente lucrativos"
-            )
+            print(f"🎯 ESTRATÉGIA ROI 20+ - Mercados comprovadamente lucrativos")
             print(f"   📊 Dados originais: {len(df)} apostas")
 
         df_filtered = df.copy()
 
-        # Filtro 1: ROI ranges lucrativos
-        roi_condition = df_filtered["est_roi_category"].isin(
-            self.config.ALLOWED_ROI_RANGES
-        )
+        # Filtro 1: ROI ≥ 20%
+        roi_condition = df_filtered["estimated_roi"] >= 20.0
         df_filtered = df_filtered[roi_condition]
         if self.verbose:
-            print(
-                f"   ✅ Após filtro ROI (≥40%, 25-30%, 20-25%): {len(df_filtered)} apostas"
-            )
+            print(f"   ✅ Após filtro ROI ≥20%: {len(df_filtered)} apostas")
 
-        # Filtro 2: Apenas odds "media" (única lucrativa)
+        # Filtro 2: ROI ranges permitidos
+        roi_range_condition = df_filtered["est_roi_category"].isin(
+            self.config.ALLOWED_ROI_RANGES
+        )
+        df_filtered = df_filtered[roi_range_condition]
+        if self.verbose:
+            print(f"   ✅ Após filtro ROI ranges: {len(df_filtered)} apostas")
+
+        # Filtro 3: Apenas odds lucrativas
         df_filtered = df_filtered[
             df_filtered["odds_category"].isin(self.config.ALLOWED_ODDS)
         ]
         if self.verbose:
-            print(f"   ✅ Após filtro odds (apenas media): {len(df_filtered)} apostas")
+            print(
+                f"   ✅ Após filtro odds (baixa/media/media_alta): {len(df_filtered)} apostas"
+            )
 
-        # Filtro 3: Apenas mercados permitidos
+        # Filtro 4: Apenas mercados permitidos
         df_filtered = df_filtered[
             df_filtered["grouped_market"].isin(self.config.ALLOWED_MARKETS)
         ]
         if self.verbose:
             print(f"   ✅ Após filtro mercados lucrativos: {len(df_filtered)} apostas")
 
-        # Filtro 4: Remover mercados proibidos (garantia extra)
+        # Filtro 5: Remover mercados proibidos
         df_filtered = df_filtered[
             ~df_filtered["grouped_market"].isin(self.config.FORBIDDEN_MARKETS)
         ]
@@ -227,12 +233,12 @@ class BettingStrategyAnalyzer:
         if len(df_filtered) > 0:
             # Pesos baseados no lucro real de cada mercado
             market_weights = {
-                "OVER - KILLS": 10,  # 11.3u - MELHOR ABSOLUTO
-                "UNDER - INHIBITORS": 8,  # 4.8u - SEGUNDO MELHOR
-                "UNDER - DRAGONS": 6,  # 3.6u - TERCEIRO
-                "UNDER - KILLS": 4,  # 0.8u - MARGINAL
-                "UNDER - TOWERS": 4,  # Mantido
-                "OVER - INHIBITORS": 2,  # 0.5u - MARGINAL
+                "UNDER - TOWERS": 10,  # 27.2u - MELHOR ABSOLUTO
+                "UNDER - DRAGONS": 9,  # 21.2u - SEGUNDO MELHOR + CONSISTENTE
+                "UNDER - KILLS": 8,  # 14.1u - TERCEIRO
+                "OVER - KILLS": 7,  # 12.0u - MELHOR OVER
+                "UNDER - INHIBITORS": 6,  # Consistente
+                "UNDER - BARONS": 5,  # 2.6u - MENOR POSITIVO
             }
 
             df_filtered["market_weight"] = (
@@ -283,14 +289,14 @@ class BettingStrategyAnalyzer:
             )
 
             # Contagens específicas para validação
-            stats["over_kills_count"] = len(
-                df_filtered[df_filtered["grouped_market"] == "OVER - KILLS"]
-            )
-            stats["under_inhibitors_count"] = len(
-                df_filtered[df_filtered["grouped_market"] == "UNDER - INHIBITORS"]
+            stats["under_towers_count"] = len(
+                df_filtered[df_filtered["grouped_market"] == "UNDER - TOWERS"]
             )
             stats["under_dragons_count"] = len(
                 df_filtered[df_filtered["grouped_market"] == "UNDER - DRAGONS"]
+            )
+            stats["over_kills_count"] = len(
+                df_filtered[df_filtered["grouped_market"] == "OVER - KILLS"]
             )
 
             # Top apostas por ROI
@@ -310,7 +316,7 @@ class BettingStrategyAnalyzer:
 
     def _print_verbose_stats(self, stats: Dict):
         """Imprime estatísticas detalhadas"""
-        print(f"\n📈 RESULTADOS DA ESTRATÉGIA REFINADA:")
+        print(f"\n📈 RESULTADOS DA ESTRATÉGIA ROI 20+:")
         print(f"   🎯 Taxa de aprovação: {stats['approval_rate']:.1f}%")
         print(f"   💰 ROI médio estimado: {stats['avg_estimated_roi']:.1f}%")
 
@@ -319,25 +325,25 @@ class BettingStrategyAnalyzer:
             over_count = stats["direction_breakdown"].get("OVER", 0)
             print(f"   🔽 UNDER: {under_count} | OVER: {over_count}")
 
-        if stats.get("over_kills_count", 0) > 0:
+        if stats.get("under_towers_count", 0) > 0:
             print(
-                f"   🏆 OVER-KILLS encontradas: {stats['over_kills_count']} (MELHOR MERCADO - 11.3u, 38.8% ROI)"
-            )
-
-        if stats.get("under_inhibitors_count", 0) > 0:
-            print(
-                f"   💎 UNDER-INHIBITORS encontradas: {stats['under_inhibitors_count']} (4.8u, 13.0% ROI)"
+                f"   🏆 UNDER-TOWERS: {stats['under_towers_count']} (MELHOR: 27.2u, 18.4% ROI)"
             )
 
         if stats.get("under_dragons_count", 0) > 0:
             print(
-                f"   🐲 UNDER-DRAGONS encontradas: {stats['under_dragons_count']} (3.6u, 15.8% ROI)"
+                f"   🐲 UNDER-DRAGONS: {stats['under_dragons_count']} (CONSISTENTE: 21.2u, 21.7% ROI)"
             )
 
-        print(f"\n   ✅ Estratégia aplicada com sucesso - Foco em mercados lucrativos!")
+        if stats.get("over_kills_count", 0) > 0:
+            print(
+                f"   ⚔️ OVER-KILLS: {stats['over_kills_count']} (MELHOR OVER: 12.0u, 16.2% ROI)"
+            )
+
+        print(f"\n   ✅ Estratégia ROI 20+ aplicada com sucesso!")
 
 
-# Funções de conveniência - MANTIDAS PARA COMPATIBILIDADE
+# Funções de conveniência - MANTIDAS EXATAMENTE IGUAIS
 def apply_optimized_strategy(df: pd.DataFrame, verbose: bool = False) -> pd.DataFrame:
     """Função principal - mantida para compatibilidade"""
     analyzer = BettingStrategyAnalyzer().set_verbose(verbose)
@@ -352,17 +358,17 @@ def apply_strategy_to_pending_bets(
 
 
 def get_strategy_summary() -> Dict:
-    """Resumo da estratégia atualizada"""
+    """Resumo da estratégia - MANTENDO ESTRUTURA EXATA"""
     config = StrategyConfig()
 
     return {
-        "name": "Estratégia Refinada - Apenas Mercados Lucrativos",
-        "version": "v9.0_FOCUSED",
+        "name": "Estratégia ROI 20+ - Baseada em Dados Reais",
+        "version": "v10.0_ROI20PLUS",
         "expected_roi": config.EXPECTED_ROI,
-        "focus": "Apenas mercados com histórico comprovado de lucro",
+        "focus": "ROI ≥20% em mercados comprovadamente lucrativos",
         "criteria": {
             "roi_ranges": config.ALLOWED_ROI_RANGES,
-            "markets": config.ALLOWED_MARKETS,
+            "markets": config.ALLOWED_MARKETS,  # ← MANTIDO IGUAL
             "odds": config.ALLOWED_ODDS,
             "preferred_direction": config.PREFERRED_DIRECTION,
             "excluded": {
@@ -371,31 +377,34 @@ def get_strategy_summary() -> Dict:
             },
         },
         "market_priority": {
-            "1": "OVER - KILLS (11.3u, 38.8% ROI)",
-            "2": "UNDER - INHIBITORS (4.8u, 13.0% ROI)",
-            "3": "UNDER - DRAGONS (3.6u, 15.8% ROI)",
-            "4": "UNDER - KILLS / UNDER - TOWERS (marginais)",
-            "5": "OVER - INHIBITORS (0.5u, marginal)",
+            "1": "UNDER - TOWERS (27.2u lucro, 18.4% ROI)",
+            "2": "UNDER - DRAGONS (21.2u lucro, 21.7% ROI) - CONSISTENTE",
+            "3": "UNDER - KILLS (14.1u lucro, 19.5% ROI)",
+            "4": "OVER - KILLS (12.0u lucro, 16.2% ROI) - MELHOR OVER",
+            "5": "UNDER - BARONS (2.6u lucro, 11.3% ROI)",
+            "6": "UNDER - INHIBITORS (incluído por consistência)",
         },
         "removed_markets": [
-            "OVER - DRAGONS",
-            "UNDER/OVER - BARONS",
-            "UNDER/OVER - DURATION",
             "OVER - TOWERS",
+            "OVER - BARONS",
+            "OVER - DURATION",
+            "UNDER - DURATION",
+            "OVER - INHIBITORS",
+            "OVER - DRAGONS",
         ],
         "strategy_principles": {
-            "1": "Foco absoluto em mercados lucrativos",
-            "2": "ROI ranges comprovados (≥40%, 25-30%, 20-25%)",
-            "3": "Apenas odds 'media' (1.6-2.0)",
-            "4": "Prioridade por OVER-KILLS",
-            "5": "Volume reduzido, qualidade aumentada",
+            "1": "ROI mínimo 20% (faixa com 14.4% ROI real comprovado)",
+            "2": "Foco em UNDER (31x melhor que OVER)",
+            "3": "Odds lucrativas: baixa/media/media_alta",
+            "4": "Prioridade: TOWERS > DRAGONS > KILLS",
+            "5": "OVER apenas em KILLS",
         },
     }
 
 
 if __name__ == "__main__":
-    print("✅ Estratégia REFINADA v9.0 - Apenas Mercados Lucrativos!")
-    print("🎯 Foco: OVER-KILLS, UNDER-INHIBITORS, UNDER-DRAGONS")
-    print("🚫 Removidos: OVER-DRAGONS, BARONS, DURATION, OVER-TOWERS")
-    print("📊 ROI esperado: 15-20% com volume reduzido")
-    print("💎 Princípio: Qualidade > Quantidade")
+    print("✅ Estratégia ROI 20+ v10.0 - Estrutura Mantida!")
+    print("🎯 Foco: UNDER-TOWERS, UNDER-DRAGONS, UNDER-KILLS, OVER-KILLS")
+    print("📊 ROI mínimo: 20% (comprovado: 8.0% ROI real)")
+    print("🔽 Direção: UNDER domina (31:1 vs OVER)")
+    print("💎 Expectativa: 8.0% ROI, ~760 apostas aprovadas")
