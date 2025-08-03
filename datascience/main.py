@@ -2,16 +2,40 @@ import pandas as pd
 import numpy as np
 import warnings
 from datetime import datetime
-from typing import Dict, List, Tuple
+from typing import Dict, List, Tuple, Optional
+from dataclasses import dataclass
 from collections import defaultdict
 
 warnings.filterwarnings("ignore")
 
 
-class RefinedBettingAnalyzer:
-    """Analisador refinado de apostas com foco em ROI otimizado"""
+@dataclass
+class AnalysisConfig:
+    """Configurações da análise"""
 
-    def __init__(self):
+    min_bets_for_roi: int = 20  # Mínimo de apostas para considerar uma faixa de ROI
+    min_bets_for_market: int = 5  # Mínimo de apostas para considerar um mercado
+    roi_ranges: List[int] = None  # Faixas de ROI para análise
+    odds_ranges: List[Tuple[float, float, str]] = None  # Faixas de odds
+
+    def __post_init__(self):
+        if self.roi_ranges is None:
+            self.roi_ranges = [10, 15, 20, 25, 30]
+        if self.odds_ranges is None:
+            self.odds_ranges = [
+                (0, 1.6, "baixa"),
+                (1.6, 2.0, "media"),
+                (2.0, 2.5, "media_alta"),
+                (2.5, 3.0, "alta"),
+                (3.0, float("inf"), "muito_alta"),
+            ]
+
+
+class CleanBettingAnalyzer:
+    """Analisador limpo e otimizado de apostas em eSports"""
+
+    def __init__(self, config: AnalysisConfig = None):
+        self.config = config or AnalysisConfig()
         self.month_translation = {
             "Jan": "Jan",
             "Fev": "Feb",
@@ -27,91 +51,19 @@ class RefinedBettingAnalyzer:
             "Dez": "Dec",
         }
 
-    def categorize_roi_ranges_plus(self, roi: float) -> str:
-        """NOVA: Ranges de ROI no formato 10+, 15+, 20+, etc."""
-        if pd.isna(roi):
-            return "N/A"
-        elif roi >= 30:
-            return "30+"
-        elif roi >= 25:
-            return "25+"
-        elif roi >= 20:
-            return "20+"
-        elif roi >= 15:
-            return "15+"
-        elif roi >= 10:
-            return "10+"
-        else:
-            return "<10"
+        # Mapeamento dos mercados baseado nos dados reais
+        self.market_mapping = {
+            "inhibitors": "INHIBITORS",
+            "dragons": "DRAGONS",
+            "barons": "BARONS",
+            "towers": "TOWERS",
+            "kills": "KILLS",
+            "duration": "DURATION",
+        }
 
-    def categorize_odds_filtered(self, odds: float) -> str:
-        """NOVA: Categorização de odds EXCLUINDO muito_baixa e muito_alta"""
-        if pd.isna(odds):
-            return "N/A"
-        elif odds <= 1.6:
-            return "baixa"
-        elif odds <= 2.0:
-            return "media"
-        elif odds <= 2.5:
-            return "media_alta"
-        elif odds <= 3.0:
-            return "alta"
-        else:
-            return "EXCLUIR"  # Marca para remoção
-
-    def categorize_market(self, bet_type: str, bet_line: str) -> Tuple[str, str, str]:
-        """Categorização de mercados"""
-        lt, ll = str(bet_type).lower(), str(bet_line).lower()
-
-        direction = "UNDER" if "under" in lt else "OVER"
-
-        if "kill" in ll:
-            if "first" in ll or "primeiro" in ll:
-                market = "FIRST_KILL"
-            elif "team" in ll or "time" in ll or "equipe" in ll:
-                market = "TEAM_KILLS"
-            else:
-                market = "KILLS"
-        elif "dragon" in ll:
-            if "first" in ll or "primeiro" in ll:
-                market = "FIRST_DRAGON"
-            elif "elder" in ll or "anciao" in ll or "ancião" in ll:
-                market = "ELDER_DRAGON"
-            else:
-                market = "DRAGONS"
-        elif "tower" in ll or "torre" in ll:
-            if "first" in ll or "primeiro" in ll or "primeira" in ll:
-                market = "FIRST_TOWER"
-            else:
-                market = "TOWERS"
-        elif "duration" in ll or "tempo" in ll or "duração" in ll or "duracao" in ll:
-            market = "DURATION"
-        elif "baron" in ll:
-            if "first" in ll or "primeiro" in ll:
-                market = "FIRST_BARON"
-            else:
-                market = "BARONS"
-        elif "inhibitor" in ll or "inibidor" in ll:
-            market = "INHIBITORS"
-        elif "herald" in ll or "arauto" in ll:
-            market = "HERALD"
-        elif "blood" in ll or "sangue" in ll:
-            market = "FIRST_BLOOD"
-        elif "gold" in ll or "ouro" in ll:
-            market = "GOLD"
-        elif "creep" in ll or "cs" in ll:
-            market = "CREEPS"
-        elif "assist" in ll or "assistencia" in ll:
-            market = "ASSISTS"
-        elif "death" in ll or "morte" in ll:
-            market = "DEATHS"
-        else:
-            market = "OUTROS"
-
-        return direction, market, f"{direction} - {market}"
-
-    def load_and_preprocess_data(self, file_path: str) -> pd.DataFrame:
-        """NOVA: Carrega dados com filtros de odds aplicados"""
+    def load_data(self, file_path: str) -> pd.DataFrame:
+        """Carrega e preprocessa os dados"""
+        print("📂 Carregando dados...")
         df = pd.read_csv(file_path)
 
         # Conversão de datas
@@ -123,41 +75,189 @@ class RefinedBettingAnalyzer:
         )
         df = df.sort_values("date", ascending=False).reset_index(drop=True)
 
+        # Conversões numéricas
         df["profit"] = pd.to_numeric(df["profit"], errors="coerce")
+        df["odds"] = pd.to_numeric(df["odds"], errors="coerce")
         df["estimated_roi"] = df["ROI"].str.rstrip("%").astype(float)
 
-        # Categorizações
-        df[["direction", "market_type", "grouped_market"]] = df.apply(
-            lambda r: self.categorize_market(r["bet_type"], r["bet_line"]),
-            axis=1,
-            result_type="expand",
-        )
+        # Extrair mercado e linha da bet_line
+        df["market"] = df["bet_line"].apply(self._extract_market)
+        df["line_value"] = df["bet_line"].str.extract(r"(\d+\.?\d*)")[0].astype(float)
+        df["direction"] = df["bet_type"].str.upper()
 
-        df["odds_category"] = df["odds"].apply(self.categorize_odds_filtered)
-        df["est_roi_category"] = df["estimated_roi"].apply(
-            self.categorize_roi_ranges_plus
-        )
+        # Criar mercado agrupado
+        df["grouped_market"] = df["direction"] + "_" + df["market"]
 
-        # NOVO: Filtrar odds muito_baixa e muito_alta
-        df_filtered = df[df["odds_category"] != "EXCLUIR"].copy()
+        # Categorizar odds e ROI
+        df["odds_category"] = df["odds"].apply(self._categorize_odds)
+        df["roi_category"] = df["estimated_roi"].apply(self._categorize_roi)
 
-        print(f"📊 DADOS APÓS FILTRAGEM DE ODDS:")
-        print(f"   Dados originais: {len(df)} apostas")
-        print(f"   Dados filtrados: {len(df_filtered)} apostas")
+        print(f"✅ {len(df)} apostas carregadas")
         print(
-            f"   Removidas: {len(df) - len(df_filtered)} apostas (odds muito baixas/altas)"
+            f"📅 Período: {df['date'].min().strftime('%Y-%m-%d')} até {df['date'].max().strftime('%Y-%m-%d')}"
+        )
+        print(f"💰 Lucro total: {df['profit'].sum():.2f}u")
+        print(f"📊 ROI geral: {(df['profit'].sum() / len(df) * 100):.2f}%")
+
+        return df
+
+    def _extract_market(self, bet_line: str) -> str:
+        """Extrai o tipo de mercado da bet_line"""
+        bet_line_lower = bet_line.lower()
+
+        for keyword, market_name in self.market_mapping.items():
+            if keyword in bet_line_lower:
+                return market_name
+
+        # Se for game_duration
+        if "game_duration" in bet_line_lower:
+            return "DURATION"
+
+        return "OTHER"
+
+    def _categorize_odds(self, odds: float) -> str:
+        """Categoriza odds em faixas"""
+        if pd.isna(odds):
+            return "N/A"
+
+        for min_val, max_val, category in self.config.odds_ranges:
+            if min_val <= odds < max_val:
+                return category
+
+        return "muito_alta"
+
+    def _categorize_roi(self, roi: float) -> str:
+        """Categoriza ROI em faixas"""
+        if pd.isna(roi):
+            return "N/A"
+
+        for threshold in sorted(self.config.roi_ranges, reverse=True):
+            if roi >= threshold:
+                return f"{threshold}+"
+
+        return f"<{self.config.roi_ranges[0]}"
+
+    def analyze_overall_performance(self, df: pd.DataFrame) -> Dict:
+        """Análise geral de performance"""
+        print("\n" + "=" * 80)
+        print("📊 ANÁLISE GERAL DE PERFORMANCE")
+        print("=" * 80)
+
+        total_bets = len(df)
+        total_profit = df["profit"].sum()
+        win_rate = (df["status"] == "win").mean() * 100
+        roi = (total_profit / total_bets * 100) if total_bets > 0 else 0
+
+        print(f"\n📈 Resumo Geral:")
+        print(f"   Total de apostas: {total_bets}")
+        print(f"   Lucro total: {total_profit:.2f}u")
+        print(f"   Taxa de acerto: {win_rate:.1f}%")
+        print(f"   ROI real: {roi:.2f}%")
+        print(f"   ROI médio estimado: {df['estimated_roi'].mean():.1f}%")
+
+        # Performance por direção
+        direction_stats = (
+            df.groupby("direction")
+            .agg(
+                {
+                    "profit": ["sum", "count"],
+                    "status": lambda x: (x == "win").mean() * 100,
+                }
+            )
+            .round(2)
         )
 
-        return df_filtered
+        print(f"\n🎯 Performance por Direção:")
+        for direction in direction_stats.index:
+            profit = direction_stats.loc[direction, ("profit", "sum")]
+            count = direction_stats.loc[direction, ("profit", "count")]
+            win_pct = direction_stats.loc[direction, ("status", "<lambda>")]
+            dir_roi = (profit / count * 100) if count > 0 else 0
 
-    def analyze_roi_ranges_comprehensive(self, df: pd.DataFrame, title: str) -> Dict:
-        """NOVA: Análise abrangente das faixas de ROI no formato 10+, 15+, etc."""
+            print(
+                f"   {direction}: {profit:+.1f}u | {int(count)} apostas | "
+                f"{win_pct:.1f}% win | {dir_roi:+.1f}% ROI"
+            )
+
+        return {
+            "total_bets": total_bets,
+            "total_profit": total_profit,
+            "win_rate": win_rate,
+            "roi": roi,
+            "direction_stats": direction_stats,
+        }
+
+    def analyze_markets(
+        self, df: pd.DataFrame, title: str = "TODOS OS MERCADOS"
+    ) -> pd.DataFrame:
+        """Análise detalhada por mercado"""
         print(f"\n" + "=" * 80)
-        print(f"🔍 ANÁLISE DE ROI RANGES - {title.upper()}")
+        print(f"🎮 ANÁLISE DE MERCADOS - {title}")
+        print("=" * 80)
+
+        # Agrupar por mercado
+        market_analysis = (
+            df.groupby("grouped_market")
+            .agg(
+                {
+                    "profit": ["sum", "count", "mean"],
+                    "status": lambda x: (x == "win").mean() * 100,
+                    "estimated_roi": "mean",
+                    "odds": "mean",
+                    "line_value": "mean",
+                }
+            )
+            .round(2)
+        )
+
+        market_analysis.columns = [
+            "profit_total",
+            "bets",
+            "profit_avg",
+            "win_rate",
+            "roi_est",
+            "odds_avg",
+            "line_avg",
+        ]
+        market_analysis["roi_real"] = (
+            market_analysis["profit_total"] / market_analysis["bets"] * 100
+        ).round(2)
+
+        # Ordenar por lucro total
+        market_analysis = market_analysis.sort_values("profit_total", ascending=False)
+
+        print(
+            f"\n{'Mercado':<20} {'Lucro':<10} {'Apostas':<8} {'Win%':<8} "
+            f"{'ROI Real':<10} {'ROI Est':<10} {'Odds':<8} {'Linha'}"
+        )
+        print("-" * 90)
+
+        for market, row in market_analysis.iterrows():
+            if row["bets"] >= self.config.min_bets_for_market:
+                status = (
+                    "🏆"
+                    if row["profit_total"] > 5
+                    else "✅"
+                    if row["profit_total"] > 0
+                    else "❌"
+                )
+                print(
+                    f"{status} {market:<18} {row['profit_total']:>8.1f}u "
+                    f"{int(row['bets']):>6} {row['win_rate']:>6.1f}% "
+                    f"{row['roi_real']:>8.1f}% {row['roi_est']:>8.1f}% "
+                    f"{row['odds_avg']:>6.2f} {row['line_avg']:>6.1f}"
+                )
+
+        return market_analysis
+
+    def analyze_roi_efficiency(self, df: pd.DataFrame) -> Dict:
+        """Análise de eficiência por faixa de ROI"""
+        print(f"\n" + "=" * 80)
+        print("🎯 ANÁLISE DE EFICIÊNCIA POR FAIXA DE ROI")
         print("=" * 80)
 
         roi_analysis = (
-            df.groupby("est_roi_category")
+            df.groupby("roi_category")
             .agg(
                 {
                     "profit": ["sum", "count", "mean"],
@@ -169,179 +269,82 @@ class RefinedBettingAnalyzer:
         )
 
         roi_analysis.columns = [
-            "Total_Profit",
-            "Bets",
-            "Avg_Profit",
-            "Win_Rate",
-            "Avg_Est_ROI",
+            "profit_total",
+            "bets",
+            "profit_avg",
+            "win_rate",
+            "roi_est_avg",
         ]
-        roi_analysis["Real_ROI"] = (
-            roi_analysis["Total_Profit"] / roi_analysis["Bets"] * 100
+        roi_analysis["roi_real"] = (
+            roi_analysis["profit_total"] / roi_analysis["bets"] * 100
         ).round(2)
-        roi_analysis["Efficiency"] = (
-            roi_analysis["Real_ROI"] / roi_analysis["Avg_Est_ROI"]
+        roi_analysis["efficiency"] = (
+            roi_analysis["roi_real"] / roi_analysis["roi_est_avg"]
         ).round(3)
 
-        # Ordenar por ROI range
-        roi_order = ["<10", "10+", "15+", "20+", "25+", "30+"]
+        # Ordenar por categoria de ROI
+        roi_order = [f"<{self.config.roi_ranges[0]}"] + [
+            f"{r}+" for r in self.config.roi_ranges
+        ]
         roi_analysis = roi_analysis.reindex(
             [cat for cat in roi_order if cat in roi_analysis.index]
         )
 
-        print(f"\n📊 PERFORMANCE POR FAIXA DE ROI:")
         print(
-            f"{'Faixa':<8} {'Lucro':<10} {'Apostas':<8} {'Win%':<6} {'ROI Real':<9} {'ROI Est.':<8} {'Eficiência'}"
+            f"\n{'Faixa ROI':<12} {'Lucro':<10} {'Apostas':<8} {'Win%':<8} "
+            f"{'ROI Real':<10} {'ROI Est':<10} {'Eficiência'}"
         )
         print("-" * 75)
 
-        best_roi_range = None
-        best_efficiency = -999
+        best_roi = None
+        best_efficiency = 0
 
-        for roi_range, row in roi_analysis.iterrows():
-            if row["Bets"] >= 20:  # Mínimo de apostas para consideração
+        for roi_cat, row in roi_analysis.iterrows():
+            if row["bets"] >= self.config.min_bets_for_roi:
                 status = (
                     "🏆"
-                    if row["Real_ROI"] >= 10
+                    if row["roi_real"] > 10
                     else "✅"
-                    if row["Real_ROI"] > 0
+                    if row["roi_real"] > 0
                     else "❌"
                 )
-                efficiency_str = (
-                    f"{row['Efficiency']:.2f}x"
-                    if not pd.isna(row["Efficiency"])
+                eff_str = (
+                    f"{row['efficiency']:.2f}x"
+                    if not pd.isna(row["efficiency"])
                     else "N/A"
                 )
 
                 print(
-                    f"{status} {roi_range:<6} {row['Total_Profit']:>8.1f}u "
-                    f"{int(row['Bets']):>6} {row['Win_Rate']:>5.1f}% "
-                    f"{row['Real_ROI']:>7.1f}% {row['Avg_Est_ROI']:>7.1f}% "
-                    f"{efficiency_str:>9}"
+                    f"{status} {roi_cat:<10} {row['profit_total']:>8.1f}u "
+                    f"{int(row['bets']):>6} {row['win_rate']:>6.1f}% "
+                    f"{row['roi_real']:>8.1f}% {row['roi_est_avg']:>8.1f}% "
+                    f"{eff_str:>10}"
                 )
 
-                # Identificar melhor faixa (ROI real > 5% e eficiência > 0.1)
-                if (
-                    row["Real_ROI"] > 5
-                    and row["Efficiency"] > 0.1
-                    and row["Efficiency"] > best_efficiency
-                ):
-                    best_efficiency = row["Efficiency"]
-                    best_roi_range = roi_range
+                # Identificar melhor faixa
+                if row["roi_real"] > 5 and row["efficiency"] > best_efficiency:
+                    best_roi = roi_cat
+                    best_efficiency = row["efficiency"]
 
-        print(f"\n🎯 MELHOR FAIXA DE ROI IDENTIFICADA: {best_roi_range}")
-        if best_roi_range:
-            best_data = roi_analysis.loc[best_roi_range]
-            print(f"   📈 ROI Real: {best_data['Real_ROI']:.1f}%")
-            print(f"   🎯 Eficiência: {best_data['Efficiency']:.2f}x")
-            print(f"   📊 Apostas: {int(best_data['Bets'])}")
-            print(f"   💰 Lucro: {best_data['Total_Profit']:.1f}u")
+        if best_roi:
+            print(
+                f"\n🎯 Melhor faixa de ROI: {best_roi} (Eficiência: {best_efficiency:.2f}x)"
+            )
 
         return {
-            "analysis": roi_analysis,
-            "best_roi_range": best_roi_range,
+            "roi_analysis": roi_analysis,
+            "best_roi_category": best_roi,
             "best_efficiency": best_efficiency,
         }
 
-    def analyze_markets_with_roi_filter(
-        self, df: pd.DataFrame, roi_filter: str, title: str
-    ) -> Dict:
-        """NOVA: Análise de mercados usando filtro de ROI otimizado"""
+    def analyze_odds_performance(self, df: pd.DataFrame) -> pd.DataFrame:
+        """Análise de performance por faixa de odds"""
         print(f"\n" + "=" * 80)
-        print(f"🎯 ANÁLISE DE MERCADOS COM FILTRO ROI ≥ {roi_filter} - {title.upper()}")
+        print("📊 ANÁLISE POR FAIXA DE ODDS")
         print("=" * 80)
 
-        # Extrair número do filtro ROI
-        roi_threshold = int(roi_filter.replace("+", ""))
-        filtered_df = df[df["estimated_roi"] >= roi_threshold].copy()
-
-        if len(filtered_df) == 0:
-            print(f"❌ Nenhuma aposta encontrada com ROI ≥ {roi_threshold}%")
-            return None
-
-        print(f"📊 DADOS COM FILTRO ROI ≥ {roi_threshold}%:")
-        print(f"   Total de apostas: {len(filtered_df)}")
-        print(f"   Lucro total: {filtered_df['profit'].sum():.1f}u")
-        print(
-            f"   ROI real: {(filtered_df['profit'].sum() / len(filtered_df) * 100):.1f}%"
-        )
-        print(f"   Win Rate: {(filtered_df['status'] == 'win').mean() * 100:.1f}%")
-
-        # Análise por mercado
-        market_analysis = (
-            filtered_df.groupby("grouped_market")
-            .agg(
-                {
-                    "profit": ["sum", "count", "mean"],
-                    "status": lambda x: (x == "win").mean() * 100,
-                    "estimated_roi": "mean",
-                    "odds": "mean",
-                }
-            )
-            .round(2)
-        )
-
-        market_analysis.columns = [
-            "Total_Profit",
-            "Bets",
-            "Avg_Profit",
-            "Win_Rate",
-            "Avg_Est_ROI",
-            "Avg_Odds",
-        ]
-        market_analysis["Real_ROI"] = (
-            market_analysis["Total_Profit"] / market_analysis["Bets"] * 100
-        ).round(2)
-
-        # Filtrar mercados com pelo menos 5 apostas
-        market_analysis = market_analysis[market_analysis["Bets"] >= 5]
-        market_analysis = market_analysis.sort_values("Total_Profit", ascending=False)
-
-        print(f"\n🏆 TOP MERCADOS (ROI ≥ {roi_threshold}%, mín. 5 apostas):")
-        print(
-            f"{'Mercado':<25} {'Lucro':<8} {'Apostas':<8} {'Win%':<6} {'ROI Real':<8} {'ROI Est.':<8} {'Odds'}"
-        )
-        print("-" * 85)
-
-        profitable_markets = []
-        for market, row in market_analysis.head(15).iterrows():
-            status = (
-                "🏆"
-                if row["Total_Profit"] >= 5
-                else "✅"
-                if row["Total_Profit"] > 0
-                else "❌"
-            )
-            print(
-                f"{status} {market:<23} {row['Total_Profit']:>6.1f}u "
-                f"{int(row['Bets']):>6} {row['Win_Rate']:>5.1f}% "
-                f"{row['Real_ROI']:>6.1f}% {row['Avg_Est_ROI']:>6.1f}% "
-                f"{row['Avg_Odds']:>5.2f}"
-            )
-
-            if row["Total_Profit"] > 0:
-                profitable_markets.append(market)
-
-        # Análise por direção
-        direction_analysis = filtered_df.groupby("direction").agg(
-            {
-                "profit": ["sum", "count"],
-                "status": lambda x: (x == "win").mean() * 100,
-            }
-        )
-        direction_analysis.columns = ["Total_Profit", "Bets", "Win_Rate"]
-
-        print(f"\n🔽 ANÁLISE POR DIREÇÃO (ROI ≥ {roi_threshold}%):")
-        for direction, row in direction_analysis.iterrows():
-            status = "✅" if row["Total_Profit"] > 0 else "❌"
-            roi = (row["Total_Profit"] / row["Bets"] * 100) if row["Bets"] > 0 else 0
-            print(
-                f"   {status} {direction}: {row['Total_Profit']:+.1f}u | "
-                f"{int(row['Bets'])} apostas | {row['Win_Rate']:.1f}% win | {roi:.1f}% ROI"
-            )
-
-        # Análise por odds filtradas
         odds_analysis = (
-            filtered_df.groupby("odds_category")
+            df.groupby("odds_category")
             .agg(
                 {
                     "profit": ["sum", "count"],
@@ -351,167 +354,301 @@ class RefinedBettingAnalyzer:
             )
             .round(2)
         )
-        odds_analysis.columns = ["Total_Profit", "Bets", "Win_Rate", "Avg_Odds"]
-        odds_analysis["Real_ROI"] = (
-            odds_analysis["Total_Profit"] / odds_analysis["Bets"] * 100
+
+        odds_analysis.columns = ["profit_total", "bets", "win_rate", "odds_avg"]
+        odds_analysis["roi"] = (
+            odds_analysis["profit_total"] / odds_analysis["bets"] * 100
         ).round(2)
 
-        print(f"\n📊 ANÁLISE POR ODDS (ROI ≥ {roi_threshold}%):")
+        # Ordenar por categoria
+        odds_order = [cat[2] for cat in self.config.odds_ranges]
+        odds_analysis = odds_analysis.reindex(
+            [cat for cat in odds_order if cat in odds_analysis.index]
+        )
+
+        print(
+            f"\n{'Faixa Odds':<15} {'Lucro':<10} {'Apostas':<8} {'Win%':<8} "
+            f"{'ROI':<8} {'Odds Média'}"
+        )
+        print("-" * 60)
+
         for odds_cat, row in odds_analysis.iterrows():
-            if row["Bets"] > 0:
-                status = "✅" if row["Total_Profit"] > 0 else "❌"
+            if row["bets"] > 0:
+                status = "✅" if row["profit_total"] > 0 else "❌"
                 print(
-                    f"   {status} {odds_cat:<12} → {row['Total_Profit']:>6.1f}u | "
-                    f"ROI: {row['Real_ROI']:>6.1f}% | {int(row['Bets'])} apostas | "
-                    f"Win: {row['Win_Rate']:>5.1f}%"
+                    f"{status} {odds_cat:<13} {row['profit_total']:>8.1f}u "
+                    f"{int(row['bets']):>6} {row['win_rate']:>6.1f}% "
+                    f"{row['roi']:>6.1f}% {row['odds_avg']:>8.2f}"
                 )
 
-        return {
-            "filtered_data": filtered_df,
-            "market_analysis": market_analysis,
-            "direction_analysis": direction_analysis,
-            "odds_analysis": odds_analysis,
-            "profitable_markets": profitable_markets,
-            "total_profit": filtered_df["profit"].sum(),
-            "total_bets": len(filtered_df),
-            "roi_threshold": roi_threshold,
-        }
+        return odds_analysis
 
-    def print_strategic_recommendations(
-        self,
-        all_data_analysis: Dict,
-        recent_data_analysis: Dict,
-        best_roi_all: str,
-        best_roi_recent: str,
-    ):
-        """NOVA: Recomendações estratégicas baseadas na análise refinada"""
-        print("\n" + "=" * 80)
-        print("🚀 RECOMENDAÇÕES ESTRATÉGICAS REFINADAS")
+    def analyze_markets_with_roi_filter(
+        self, df: pd.DataFrame, min_roi: float, title: str = "MERCADOS FILTRADOS"
+    ) -> pd.DataFrame:
+        """Análise de mercados aplicando filtro de ROI mínimo"""
+        print(f"\n" + "=" * 80)
+        print(f"🎯 {title} - ROI MÍNIMO: {min_roi}%")
         print("=" * 80)
 
-        print(f"\n📊 RESUMO EXECUTIVO:")
-        print(f"   🎯 Melhor ROI (todos os dados): {best_roi_all}")
-        print(f"   🎯 Melhor ROI (últimos 200): {best_roi_recent}")
+        # Filtrar por ROI mínimo
+        df_filtered = df[df["estimated_roi"] >= min_roi].copy()
 
-        if all_data_analysis and recent_data_analysis:
-            all_profit = all_data_analysis["total_profit"]
-            recent_profit = recent_data_analysis["total_profit"]
+        print(f"\n📊 Impacto do Filtro ROI ≥ {min_roi}%:")
+        print(f"   Apostas originais: {len(df)}")
+        print(
+            f"   Apostas filtradas: {len(df_filtered)} ({len(df_filtered) / len(df) * 100:.1f}%)"
+        )
+        print(f"   Lucro sem filtro: {df['profit'].sum():.1f}u")
+        print(f"   Lucro com filtro: {df_filtered['profit'].sum():.1f}u")
+        print(f"   ROI sem filtro: {(df['profit'].sum() / len(df) * 100):.1f}%")
+        print(
+            f"   ROI com filtro: {(df_filtered['profit'].sum() / len(df_filtered) * 100):.1f}%"
+        )
 
-            print(f"   💰 Lucro total (filtrado): {all_profit:.1f}u")
-            print(f"   💰 Lucro recente (últimos 200): {recent_profit:.1f}u")
+        if len(df_filtered) == 0:
+            print("\n❌ Nenhuma aposta encontrada com este filtro de ROI")
+            return pd.DataFrame()
 
-            # Mercados consistentes
-            all_markets = set(all_data_analysis["profitable_markets"][:5])
-            recent_markets = set(recent_data_analysis["profitable_markets"][:5])
-            consistent_markets = all_markets.intersection(recent_markets)
+        # Análise por mercado com filtro aplicado
+        market_analysis = (
+            df_filtered.groupby("grouped_market")
+            .agg(
+                {
+                    "profit": ["sum", "count", "mean"],
+                    "status": lambda x: (x == "win").mean() * 100,
+                    "estimated_roi": "mean",
+                    "odds": "mean",
+                    "line_value": "mean",
+                }
+            )
+            .round(2)
+        )
 
-            print(f"\n🎯 MERCADOS CONSISTENTEMENTE LUCRATIVOS:")
-            for market in consistent_markets:
-                all_roi = all_data_analysis["market_analysis"].loc[market, "Real_ROI"]
-                recent_roi = recent_data_analysis["market_analysis"].loc[
-                    market, "Real_ROI"
-                ]
+        market_analysis.columns = [
+            "profit_total",
+            "bets",
+            "profit_avg",
+            "win_rate",
+            "roi_est",
+            "odds_avg",
+            "line_avg",
+        ]
+        market_analysis["roi_real"] = (
+            market_analysis["profit_total"] / market_analysis["bets"] * 100
+        ).round(2)
+
+        # Ordenar por lucro total
+        market_analysis = market_analysis.sort_values("profit_total", ascending=False)
+
+        print(
+            f"\n{'Mercado':<20} {'Lucro':<10} {'Apostas':<8} {'Win%':<8} "
+            f"{'ROI Real':<10} {'ROI Est':<10} {'Odds':<8} {'Linha'}"
+        )
+        print("-" * 90)
+
+        for market, row in market_analysis.iterrows():
+            if row["bets"] >= 3:  # Mínimo ainda menor para filtros restritivos
+                status = (
+                    "🏆"
+                    if row["profit_total"] > 5
+                    else "✅"
+                    if row["profit_total"] > 0
+                    else "❌"
+                )
                 print(
-                    f"   🏆 {market}: {all_roi:.1f}% (total) | {recent_roi:.1f}% (recente)"
+                    f"{status} {market:<18} {row['profit_total']:>8.1f}u "
+                    f"{int(row['bets']):>6} {row['win_rate']:>6.1f}% "
+                    f"{row['roi_real']:>8.1f}% {row['roi_est']:>8.1f}% "
+                    f"{row['odds_avg']:>6.2f} {row['line_avg']:>6.1f}"
                 )
 
-            # Direções recomendadas
-            print(f"\n🔽 DIREÇÕES RECOMENDADAS:")
+        return market_analysis
 
-            all_direction = all_data_analysis["direction_analysis"]
-            recent_direction = recent_data_analysis["direction_analysis"]
+    def generate_strategy_report(
+        self, df: pd.DataFrame, lookback_periods: List[int] = None
+    ) -> None:
+        """Gera relatório estratégico completo"""
+        if lookback_periods is None:
+            lookback_periods = [100, 200, 500]
 
-            for direction in ["UNDER", "OVER"]:
-                if (
-                    direction in all_direction.index
-                    and direction in recent_direction.index
-                ):
-                    all_profit_dir = all_direction.loc[direction, "Total_Profit"]
-                    recent_profit_dir = recent_direction.loc[direction, "Total_Profit"]
+        print("\n" + "=" * 80)
+        print("📋 RELATÓRIO ESTRATÉGICO COMPLETO")
+        print("=" * 80)
 
-                    status = (
-                        "✅"
-                        if all_profit_dir > 0 and recent_profit_dir > 0
-                        else "⚠️"
-                        if all_profit_dir > 0 or recent_profit_dir > 0
-                        else "❌"
+        # Análise para diferentes períodos
+        results = {}
+
+        for period in [len(df)] + lookback_periods:
+            if period <= len(df):
+                df_period = df.head(period) if period < len(df) else df
+                period_name = (
+                    f"Últimas {period} apostas"
+                    if period < len(df)
+                    else "Todos os dados"
+                )
+
+                print(f"\n\n{'=' * 60}")
+                print(f"📅 {period_name.upper()}")
+                print(f"{'=' * 60}")
+
+                # Análises
+                overall = self.analyze_overall_performance(df_period)
+                markets = self.analyze_markets(df_period, period_name)
+                roi_eff = self.analyze_roi_efficiency(df_period)
+                odds_perf = self.analyze_odds_performance(df_period)
+
+                results[period] = {
+                    "overall": overall,
+                    "markets": markets,
+                    "roi_efficiency": roi_eff,
+                    "odds_performance": odds_perf,
+                    "df_period": df_period,  # Guardar o dataframe para análise filtrada
+                }
+
+        # Aplicar análise com filtro de ROI ótimo
+        self._analyze_with_optimal_roi_filter(results)
+
+        # Recomendações finais
+        self._print_final_recommendations(results, df)
+
+    def _analyze_with_optimal_roi_filter(self, results: Dict) -> None:
+        """Aplica análise com filtro de ROI ótimo identificado"""
+        print("\n" + "=" * 80)
+        print("🔍 ANÁLISE COM FILTRO DE ROI ÓTIMO")
+        print("=" * 80)
+
+        # Pegar o melhor ROI de todos os dados
+        all_data_roi = results[list(results.keys())[0]]["roi_efficiency"]
+        best_roi_category = all_data_roi["best_roi_category"]
+
+        if best_roi_category and "+" in best_roi_category:
+            optimal_roi = int(best_roi_category.replace("+", ""))
+
+            print(f"\n🎯 ROI ótimo identificado: {optimal_roi}%+")
+            print("Aplicando filtro para análise detalhada...")
+
+            # Aplicar para todos os dados e período recente
+            for period_key in [
+                list(results.keys())[0],
+                min(200, list(results.keys())[0]),
+            ]:
+                if period_key in results:
+                    df_period = results[period_key]["df_period"]
+                    period_name = (
+                        "Todos os dados"
+                        if period_key == len(df_period)
+                        else f"Últimas {period_key} apostas"
                     )
+
+                    self.analyze_markets_with_roi_filter(
+                        df_period,
+                        optimal_roi,
+                        f"ANÁLISE FILTRADA - {period_name.upper()}",
+                    )
+
+    def _print_final_recommendations(self, results: Dict, df: pd.DataFrame) -> None:
+        """Imprime recomendações estratégicas finais"""
+        print("\n" + "=" * 80)
+        print("🚀 RECOMENDAÇÕES ESTRATÉGICAS FINAIS")
+        print("=" * 80)
+
+        # Identificar padrões consistentes
+        all_data_results = results[len(df)]
+        recent_results = results.get(200, results.get(100))
+
+        if recent_results:
+            # Mercados consistentemente lucrativos
+            all_markets = all_data_results["markets"]
+            recent_markets = recent_results["markets"]
+
+            profitable_all = set(all_markets[all_markets["profit_total"] > 0].index)
+            profitable_recent = set(
+                recent_markets[recent_markets["profit_total"] > 0].index
+            )
+
+            consistent_markets = profitable_all.intersection(profitable_recent)
+
+            if consistent_markets:
+                print(f"\n🎯 MERCADOS CONSISTENTEMENTE LUCRATIVOS:")
+                for market in sorted(consistent_markets):
+                    all_roi = all_markets.loc[market, "roi_real"]
+                    recent_roi = recent_markets.loc[market, "roi_real"]
                     print(
-                        f"   {status} {direction}: {all_profit_dir:+.1f}u (total) | {recent_profit_dir:+.1f}u (recente)"
+                        f"   • {market}: {all_roi:.1f}% (histórico) | {recent_roi:.1f}% (recente)"
                     )
+
+            # Melhor faixa de ROI
+            best_roi_all = all_data_results["roi_efficiency"]["best_roi_category"]
+            best_roi_recent = recent_results["roi_efficiency"]["best_roi_category"]
+
+            print(f"\n📊 FAIXAS DE ROI RECOMENDADAS:")
+            print(f"   • Histórico: {best_roi_all or 'Nenhuma identificada'}")
+            print(f"   • Recente: {best_roi_recent or 'Nenhuma identificada'}")
 
             # Odds recomendadas
-            print(f"\n📊 ODDS RECOMENDADAS:")
-            all_odds = all_data_analysis["odds_analysis"]
-            recent_odds = recent_data_analysis["odds_analysis"]
+            print(f"\n🎲 FAIXAS DE ODDS LUCRATIVAS:")
+            odds_all = all_data_results["odds_performance"]
+            odds_recent = recent_results["odds_performance"]
 
-            for odds_cat in ["baixa", "media", "media_alta", "alta"]:
-                if odds_cat in all_odds.index and odds_cat in recent_odds.index:
-                    all_profit_odds = all_odds.loc[odds_cat, "Total_Profit"]
-                    recent_profit_odds = recent_odds.loc[odds_cat, "Total_Profit"]
+            for odds_cat in odds_all.index:
+                if odds_cat in odds_recent.index:
+                    if (
+                        odds_all.loc[odds_cat, "profit_total"] > 0
+                        and odds_recent.loc[odds_cat, "profit_total"] > 0
+                    ):
+                        print(f"   • {odds_cat}: Consistentemente lucrativa")
 
-                    if all_profit_odds > 0 and recent_profit_odds > 0:
-                        print(
-                            f"   ✅ {odds_cat}: {all_profit_odds:+.1f}u (total) | {recent_profit_odds:+.1f}u (recente)"
-                        )
-
-        print(f"\n🎯 ESTRATÉGIA FINAL RECOMENDADA:")
-        print(f"   1. Usar ROI mínimo: {best_roi_recent or best_roi_all}")
-        print(f"   2. Focar nos mercados consistentes listados acima")
-        print(f"   3. Priorizar direção com melhor performance em ambos os períodos")
-        print(f"   4. Usar apenas odds que foram lucrativas em ambos os períodos")
+        print(f"\n💡 ESTRATÉGIA FINAL SUGERIDA:")
+        print(f"   1. Focar nos mercados consistentemente lucrativos listados")
+        print(f"   2. Usar filtro de ROI baseado na análise de eficiência")
+        print(f"   3. Manter-se nas faixas de odds que demonstram lucro consistente")
+        print(f"   4. Monitorar tendências recentes vs. históricas para ajustes")
 
 
 def main():
-    """Função principal refinada"""
-    analyzer = RefinedBettingAnalyzer()
+    """Função principal otimizada"""
+    # Configurações
+    config = AnalysisConfig(
+        min_bets_for_roi=20,
+        min_bets_for_market=5,
+        roi_ranges=[10, 15, 20, 25, 30],
+        odds_ranges=[
+            (0, 1.6, "baixa"),
+            (1.6, 2.0, "media"),
+            (2.0, 2.5, "media_alta"),
+            (2.5, 3.0, "alta"),
+            (3.0, float("inf"), "muito_alta"),
+        ],
+    )
+
+    # Inicializar analisador
+    analyzer = CleanBettingAnalyzer(config)
 
     # Caminho do arquivo
     file_path = "../bets/bets_atualizadas_por_mapa.csv"
 
-    print("🚀 INICIANDO ANÁLISE REFINADA DE APOSTAS")
+    print("🚀 INICIANDO ANÁLISE COMPLETA DE APOSTAS")
     print("=" * 60)
 
-    # Carregar dados com filtros aplicados
-    df = analyzer.load_and_preprocess_data(file_path)
+    try:
+        # Carregar dados
+        df = analyzer.load_data(file_path)
 
-    # 1. ANÁLISE DE ROI RANGES - TODOS OS DADOS
-    roi_analysis_all = analyzer.analyze_roi_ranges_comprehensive(df, "TODOS OS DADOS")
-    best_roi_all = roi_analysis_all["best_roi_range"]
+        # Gerar relatório estratégico completo
+        analyzer.generate_strategy_report(df, lookback_periods=[100, 200, 500])
 
-    # 2. ANÁLISE DE ROI RANGES - ÚLTIMOS 200 JOGOS
-    df_200 = df.head(200)
-    roi_analysis_200 = analyzer.analyze_roi_ranges_comprehensive(
-        df_200, "ÚLTIMOS 200 JOGOS"
-    )
-    best_roi_recent = roi_analysis_200["best_roi_range"]
+        print("\n" + "=" * 80)
+        print("✅ ANÁLISE CONCLUÍDA COM SUCESSO!")
+        print("=" * 80)
 
-    # 3. ANÁLISE DE MERCADOS COM FILTRO ROI OTIMIZADO - TODOS OS DADOS
-    if best_roi_all:
-        all_data_analysis = analyzer.analyze_markets_with_roi_filter(
-            df, best_roi_all, "TODOS OS DADOS"
-        )
-    else:
-        print("⚠️ Nenhuma faixa de ROI ótima encontrada para todos os dados")
-        all_data_analysis = None
+    except FileNotFoundError:
+        print(f"❌ Erro: Arquivo não encontrado em {file_path}")
+    except Exception as e:
+        print(f"❌ Erro durante análise: {str(e)}")
+        import traceback
 
-    # 4. ANÁLISE DE MERCADOS COM FILTRO ROI OTIMIZADO - ÚLTIMOS 200 JOGOS
-    if best_roi_recent:
-        recent_data_analysis = analyzer.analyze_markets_with_roi_filter(
-            df_200, best_roi_recent, "ÚLTIMOS 200 JOGOS"
-        )
-    else:
-        print("⚠️ Nenhuma faixa de ROI ótima encontrada para últimos 200 jogos")
-        recent_data_analysis = None
-
-    # 5. RECOMENDAÇÕES ESTRATÉGICAS FINAIS
-    analyzer.print_strategic_recommendations(
-        all_data_analysis, recent_data_analysis, best_roi_all, best_roi_recent
-    )
-
-    print("\n" + "=" * 80)
-    print("✅ ANÁLISE REFINADA CONCLUÍDA!")
-    print("=" * 80)
+        traceback.print_exc()
 
 
 if __name__ == "__main__":
