@@ -467,9 +467,9 @@ date,league,t1,t2,bet_type,bet_line,ROI,fair_odds,odds,House,url,status,telegram
 1 Ago 2025 11:30,TCL,ULF Esports,The Forbidden Five,over,total_dragons 4.5,24.50%,1.33,1.66,BET365,url não disponível,loss,1,1,-1.0
 1 Ago 2025 13:00,LFL,BK ROG Esports,Solary,under,total_inhibitors 1.5,20.00%,1.5,1.8,BET365,url não disponível,win,1,1,0.8
 1 Ago 2025 13:00,PRM,ROSSMANN Centaurs,TeamOrangeGaming,under,total_inhibitors 1.5,38.89%,1.44,2.0,BET365,url não disponível,win,1,1,1.0
-1 Ago 2025 13:30,TCL,Bushido Wildcats,BoostGate Esports,over,total_inhibitors 1.5,24.50%,1.33,1.66,BET365,url não disponível,pending,1,0,0.0
-1 Ago 2025 14:30,TCL,Papara SuperMassive,Beşiktaş Esports,under,total_towers 12.5,20.75%,1.33,1.61,BET365,url não disponível,pending,1,0,0.0
-1 Ago 2025 14:30,TCL,Papara SuperMassive,Beşiktaş Esports,under,total_barons 1.5,19.00%,1.14,1.36,BET365,url não disponível,pending,1,0,0.0
+1 Ago 2025 13:30,TCL,Bushido Wildcats,BoostGate Esports,over,total_inhibitors 1.5,24.50%,1.33,1.66,BET365,url não disponível,win,1,0,0.0
+1 Ago 2025 14:30,TCL,Papara SuperMassive,Beşiktaş Esports,under,total_towers 12.5,20.75%,1.33,1.61,BET365,url não disponível,loss,1,0,0.0
+1 Ago 2025 14:30,TCL,Papara SuperMassive,Beşiktaş Esports,under,total_barons 1.5,19.00%,1.14,1.36,BET365,url não disponível,loss,1,0,0.0
 1 Ago 2025 16:00,LFL,Gentle Mates,Galions,under,game_duration 32.5,56.86%,1.17,1.83,BET365,url não disponível,loss,1,1,-1.0
 1 Ago 2025 16:00,LFL,Gentle Mates,Galions,under,total_dragons 4.5,35.00%,1.56,2.1,BET365,url não disponível,loss,1,1,-1.0
 1 Ago 2025 21:00,NACL,Winthrop University,CCG Esports,under,total_kills 29.5,26.16%,1.45,1.83,BET365,url não disponível,loss,1,1,-1.0
@@ -512,18 +512,18 @@ date,league,t1,t2,bet_type,bet_line,ROI,fair_odds,odds,House,url,status,telegram
 2 Ago 2025 15:00,LTA S,Fluxo W7M,Isurus Estral,under,total_inhibitors 1.5,48.75%,1.41,2.1,BET365,url não disponível,pending,1,0,0.0
 2 Ago 2025 15:00,LTA S,Fluxo W7M,Isurus Estral,over,total_towers 12.5,19.17%,1.85,2.2,BET365,url não disponível,pending,1,0,0.0
 2 Ago 2025 20:00,LTA N,LYON,Team Liquid,over,total_dragons 4.5,14.00%,1.67,1.9,BET365,url não disponível,win,1,1,0.9
-3 Ago 2025 12:00,LTA S,Leviatan,Vivo Keyd Stars,under,game_duration 31.5,41.83%,1.29,1.83,BET365,url não disponível,win,1,0,0.0
-3 Ago 2025 12:00,LTA S,Leviatan,Vivo Keyd Stars,under,total_dragons 4.5,37.75%,1.38,1.9,BET365,url não disponível,win,1,0,0.0
-3 Ago 2025 12:00,LEC,Team BDS,SK Gaming,over,total_barons 1.5,32.58%,2.64,3.5,BET365,url não disponível,win,1,0,0.0
-3 Ago 2025 12:00,LEC,Team BDS,SK Gaming,over,total_dragons 4.5,19.70%,1.25,1.5,BET365,url não disponível,win,1,0,0.0
-3 Ago 2025 14:00,LEC,GiantX,Karmine Corp,under,total_dragons 4.5,50.00%,1.5,2.25,BET365,url não disponível,loss,1,0,0.0
-3 Ago 2025 14:00,LEC,GiantX,Karmine Corp,under,total_towers 12.5,42.50%,1.26,1.8,BET365,url não disponível,loss,1,0,0.0
-3 Ago 2025 20:00,LTA N,Disguised,Shopify Rebellion,under,total_dragons 4.5,75.00%,1.2,2.1,BET365,url não disponível,loss,1,0,0.0
-3 Ago 2025 20:00,LTA N,Disguised,Shopify Rebellion,under,game_duration 33.5,44.88%,1.26,1.83,BET365,url não disponível,loss,1,0,0.0
-4 Ago 2025 12:00,LEC,SK Gaming,Fnatic,under,total_inhibitors 1.5,33.33%,1.65,2.2,BET365,url não disponível,pending,1,0,0.0
-4 Ago 2025 12:00,LEC,SK Gaming,Fnatic,under,total_towers 12.5,12.43%,1.36,1.53,BET365,url não disponível,pending,1,0,0.0
-4 Ago 2025 14:00,LEC,GiantX,Team Vitality,under,total_towers 12.5,55.83%,1.41,2.2,BET365,url não disponível,pending,1,0,0.0
-4 Ago 2025 14:00,LEC,GiantX,Team Vitality,under,total_dragons 4.5,45.83%,1.71,2.5,BET365,url não disponível,pending,1,0,0.0
+3 Ago 2025 12:00,LTA S,Leviatan,Vivo Keyd Stars,under,game_duration 31.5,41.83%,1.29,1.83,BET365,url não disponível,win,1,1,0.83
+3 Ago 2025 12:00,LTA S,Leviatan,Vivo Keyd Stars,under,total_dragons 4.5,37.75%,1.38,1.9,BET365,url não disponível,win,1,1,0.9
+3 Ago 2025 12:00,LEC,Team BDS,SK Gaming,over,total_barons 1.5,32.58%,2.64,3.5,BET365,url não disponível,win,1,1,2.5
+3 Ago 2025 12:00,LEC,Team BDS,SK Gaming,over,total_dragons 4.5,19.70%,1.25,1.5,BET365,url não disponível,win,1,1,0.5
+3 Ago 2025 14:00,LEC,GiantX,Karmine Corp,under,total_dragons 4.5,50.00%,1.5,2.25,BET365,url não disponível,loss,1,1,-1.0
+3 Ago 2025 14:00,LEC,GiantX,Karmine Corp,under,total_towers 12.5,42.50%,1.26,1.8,BET365,url não disponível,loss,1,1,-1.0
+3 Ago 2025 20:00,LTA N,Disguised,Shopify Rebellion,under,total_dragons 4.5,75.00%,1.2,2.1,BET365,url não disponível,loss,1,1,-1.0
+3 Ago 2025 20:00,LTA N,Disguised,Shopify Rebellion,under,game_duration 33.5,44.88%,1.26,1.83,BET365,url não disponível,loss,1,1,-1.0
+4 Ago 2025 12:00,LEC,SK Gaming,Fnatic,under,total_inhibitors 1.5,33.33%,1.65,2.2,BET365,url não disponível,win,1,0,0.0
+4 Ago 2025 12:00,LEC,SK Gaming,Fnatic,under,total_towers 12.5,12.43%,1.36,1.53,BET365,url não disponível,win,1,0,0.0
+4 Ago 2025 14:00,LEC,GiantX,Team Vitality,under,total_towers 12.5,55.83%,1.41,2.2,BET365,url não disponível,win,1,0,0.0
+4 Ago 2025 14:00,LEC,GiantX,Team Vitality,under,total_dragons 4.5,45.83%,1.71,2.5,BET365,url não disponível,win,1,0,0.0
 5 Ago 2025 06:00,LPL,Ninjas in Pyjamas,ThunderTalk Gaming,under,total_inhibitors 1.5,23.53%,1.48,1.83,BET365,url não disponível,pending,1,0,0.0
 5 Ago 2025 08:00,LPL,Top Esports,Anyone's Legend,under,total_kills 30.5,22.00%,1.5,1.83,BET365,url não disponível,pending,1,0,0.0
 5 Ago 2025 08:00,LPL,Top Esports,Anyone's Legend,under,total_inhibitors 1.5,22.00%,1.5,1.83,BET365,url não disponível,pending,1,0,0.0
@@ -544,11 +544,11 @@ date,league,t1,t2,bet_type,bet_line,ROI,fair_odds,odds,House,url,status,telegram
 7 Ago 2025 16:00,NLC,Los Ratones,NORD Esports,under,total_dragons 4.5,65.00%,1.33,2.2,BET365,url não disponível,pending,1,0,0.0
 7 Ago 2025 16:00,NLC,Rich Gang,Verdant,under,total_dragons 4.5,31.25%,1.71,2.25,BET365,url não disponível,pending,1,0,0.0
 7 Ago 2025 16:00,NLC,Rich Gang,Verdant,under,total_inhibitors 1.5,28.33%,1.71,2.2,BET365,url não disponível,pending,1,0,0.0
-3 Ago 2025 15:00,LTA S,LOUD,RED Canids,under,total_dragons 4.5,50.00%,1.4,2.1,BET365,url não disponível,loss,1,0,0.0
-3 Ago 2025 15:00,LTA S,LOUD,RED Canids,under,total_inhibitors 1.5,35.00%,1.56,2.1,BET365,url não disponível,loss,1,0,0.0
-4 Ago 2025 05:00,LCKC,KT Rolster Challengers,Gen.G Global Academy,under,total_kills 31.5,23.41%,1.48,1.83,BET365,url não disponível,pending,1,0,0.0
-4 Ago 2025 07:00,LCKC,Nongshim Esports Academy,OKSavingsBank BRION Challengers,under,total_inhibitors 1.5,46.59%,1.53,2.25,BET365,url não disponível,pending,1,0,0.0
-4 Ago 2025 07:00,LCKC,Nongshim Esports Academy,OKSavingsBank BRION Challengers,under,total_barons 1.5,15.61%,1.21,1.4,BET365,url não disponível,pending,1,0,0.0
+3 Ago 2025 15:00,LTA S,LOUD,RED Canids,under,total_dragons 4.5,50.00%,1.4,2.1,BET365,url não disponível,loss,1,1,-1.0
+3 Ago 2025 15:00,LTA S,LOUD,RED Canids,under,total_inhibitors 1.5,35.00%,1.56,2.1,BET365,url não disponível,loss,1,1,-1.0
+4 Ago 2025 05:00,LCKC,KT Rolster Challengers,Gen.G Global Academy,under,total_kills 31.5,23.41%,1.48,1.83,BET365,url não disponível,win,1,0,0.0
+4 Ago 2025 07:00,LCKC,Nongshim Esports Academy,OKSavingsBank BRION Challengers,under,total_inhibitors 1.5,46.59%,1.53,2.25,BET365,url não disponível,win,1,0,0.0
+4 Ago 2025 07:00,LCKC,Nongshim Esports Academy,OKSavingsBank BRION Challengers,under,total_barons 1.5,15.61%,1.21,1.4,BET365,url não disponível,win,1,0,0.0
 5 Ago 2025 07:00,LCKC,DRX Challengers,T1 Esports Academy,under,total_dragons 4.5,17.32%,2.23,2.62,BET365,url não disponível,pending,1,0,0.0
 5 Ago 2025 13:00,PRM,Kaufland Hangry Knights,Eintracht Spandau,under,total_dragons 4.5,36.36%,1.65,2.25,BET365,url não disponível,pending,1,0,0.0
 5 Ago 2025 17:00,CD,e-Champ Gaming,KaBuM! Ilha das Lendas,over,total_kills 31.5,26.69%,1.44,1.83,BET365,url não disponível,pending,1,0,0.0
